@@ -4,9 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>POS Billing</title>
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIlBPUyBCaWxsaW5nIiwgInNob3J0X25hbWUiOiAiUE9TIEJpbGxpbmciLCAic3RhcnRfdXJsIjogIi4iLCAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwgImJhY2tncm91bmRfY29sb3IiOiAiI2UzZTNlMyIsICJ0aGVtZV9jb2xvciI6ICIjZWI5YzNhIiwgImljb25zIjogW3sic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjRiV3h1Y3owbmFIUjBjRG92TDNkM2R5NTNNeTV2Y21jdk1qQXdNQzl6ZG1jbklIZHBaSFJvUFNjeE9USW5JR2hsYVdkb2REMG5NVGt5Sno0OGNtVmpkQ0IzYVdSMGFEMG5NVGt5SnlCb1pXbG5hSFE5SnpFNU1pY2djbmc5SnpNeUp5Qm1hV3hzUFNjalpXSTVZek5oSnk4K1BIUmxlSFFnZUQwbk9UWW5JSGs5SnpFeU1pY2dabTl1ZEMxemFYcGxQU2MyT0NjZ1ptOXVkQzFtWVcxcGJIazlKMEZ5YVdGc0xDQnpZVzV6TFhObGNtbG1KeUJtYjI1MExYZGxhV2RvZEQwblltOXNaQ2NnWm1sc2JEMG5kMmhwZEdVbklIUmxlSFF0WVc1amFHOXlQU2R0YVdSa2JHVW5QbEJQVXp3dmRHVjRkRDQ4TDNOMlp6ND0iLCAic2l6ZXMiOiAiMTkyeDE5MiIsICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiLCAicHVycG9zZSI6ICJhbnkifSwgeyJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBuYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNuSUhkcFpIUm9QU2N4T1RJbklHaGxhV2RvZEQwbk1Ua3lKejQ4Y21WamRDQjNhV1IwYUQwbk1Ua3lKeUJvWldsbmFIUTlKekU1TWljZ2NuZzlKek15SnlCbWFXeHNQU2NqWldJNVl6TmhKeTgrUEhSbGVIUWdlRDBuT1RZbklIazlKekV5TWljZ1ptOXVkQzF6YVhwbFBTYzJPQ2NnWm05dWRDMW1ZVzFwYkhrOUowRnlhV0ZzTENCellXNXpMWE5sY21sbUp5Qm1iMjUwTFhkbGFXZG9kRDBuWW05c1pDY2dabWxzYkQwbmQyaHBkR1VuSUhSbGVIUXRZVzVqYUc5eVBTZHRhV1JrYkdVblBsQlBVend2ZEdWNGRENDhMM04yWno0PSIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIsICJwdXJwb3NlIjogImFueSJ9XX0=">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxOTInIGhlaWdodD0nMTkyJz48cmVjdCB3aWR0aD0nMTkyJyBoZWlnaHQ9JzE5Micgcng9JzMyJyBmaWxsPScjZWI5YzNhJy8+PHRleHQgeD0nOTYnIHk9JzEyMicgZm9udC1zaXplPSc2OCcgZm9udC1mYW1pbHk9J0FyaWFsLCBzYW5zLXNlcmlmJyBmb250LXdlaWdodD0nYm9sZCcgZmlsbD0nd2hpdGUnIHRleHQtYW5jaG9yPSdtaWRkbGUnPlBPUzwvdGV4dD48L3N2Zz4=">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxOTInIGhlaWdodD0nMTkyJz48cmVjdCB3aWR0aD0nMTkyJyBoZWlnaHQ9JzE5Micgcng9JzMyJyBmaWxsPScjZWI5YzNhJy8+PHRleHQgeD0nOTYnIHk9JzEyMicgZm9udC1zaXplPSc2OCcgZm9udC1mYW1pbHk9J0FyaWFsLCBzYW5zLXNlcmlmJyBmb250LXdlaWdodD0nYm9sZCcgZmlsbD0nd2hpdGUnIHRleHQtYW5jaG9yPSdtaWRkbGUnPlBPUzwvdGV4dD48L3N2Zz4=">
+<meta name="theme-color" content="#eb9c3a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="POS Billing">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
   :root{
+    --fscale:1;
     --bg:#e3e3e3;
     --orange:#eb9c3a;
     --orange-dark:#d6862a;
@@ -43,13 +51,13 @@
     padding:14px 12px 10px;
   }
   .topbar .menu-btn{
-    background:none;border:none;font-size:20px;color:var(--dark);padding:4px;cursor:pointer;
+    background:none;border:none;font-size:calc(20px * var(--fscale));color:var(--dark);padding:4px;cursor:pointer;
   }
   .topbar h1{
-    flex:1;font-size:19px;font-weight:700;margin:0;letter-spacing:.2px;
+    flex:1;font-size:calc(19px * var(--fscale));font-weight:700;margin:0;letter-spacing:.2px;
   }
   .pill-btn{
-    border:none;border-radius:8px;padding:9px 14px;font-weight:700;font-size:13px;color:#fff;cursor:pointer;white-space:nowrap;
+    border:none;border-radius:8px;padding:9px 14px;font-weight:700;font-size:calc(13px * var(--fscale));color:#fff;cursor:pointer;white-space:nowrap;
   }
   .pill-orange{background:var(--orange);}
   .pill-orange:active{background:var(--orange-dark);}
@@ -58,7 +66,7 @@
 
   /* ---------- TABLE HEADER ---------- */
   .table-head{
-    display:flex;background:var(--orange);color:#fff;font-weight:700;font-size:13px;
+    display:flex;background:var(--orange);color:#fff;font-weight:700;font-size:calc(13px * var(--fscale));
     padding:11px 12px;letter-spacing:.3px;
   }
   .table-head span{text-align:right;}
@@ -74,25 +82,25 @@
     flex:1;overflow-y:auto;background:var(--bg);min-height:60px;
   }
   .cart-row{
-    display:flex;align-items:center;padding:10px 12px;font-size:14px;background:#fff;
+    display:flex;align-items:center;padding:10px 12px;font-size:calc(14px * var(--fscale));background:#fff;
     border-bottom:1px solid #dcdcdc;
   }
   .cart-row .name{flex:1;font-weight:600;}
   .cart-row .qtybox{width:56px;display:flex;align-items:center;justify-content:center;gap:4px;}
   .cart-row .qtybox button{
-    width:20px;height:20px;border:none;border-radius:4px;background:var(--orange);color:#fff;font-size:12px;line-height:1;cursor:pointer;
+    width:20px;height:20px;border:none;border-radius:4px;background:var(--orange);color:#fff;font-size:calc(12px * var(--fscale));line-height:1;cursor:pointer;
   }
   .cart-row .rate{width:64px;text-align:right;color:#555;}
   .cart-row .total{width:72px;text-align:right;font-weight:700;color:var(--orange-dark);}
-  .cart-row .del{width:22px;text-align:center;color:var(--red);font-size:13px;cursor:pointer;margin-left:6px;}
+  .cart-row .del{width:22px;text-align:center;color:var(--red);font-size:calc(13px * var(--fscale));cursor:pointer;margin-left:6px;}
   .cart-empty{
-    text-align:center;color:#999;padding:40px 20px;font-size:13px;
+    text-align:center;color:#999;padding:40px 20px;font-size:calc(13px * var(--fscale));
   }
 
   /* ---------- TOTAL BAR ---------- */
   .totalbar{
     display:flex;justify-content:space-between;align-items:center;
-    background:var(--gray);color:#fff;font-weight:700;font-size:16px;
+    background:var(--gray);color:#fff;font-weight:700;font-size:calc(16px * var(--fscale));
     padding:12px 16px;
   }
 
@@ -101,10 +109,10 @@
     display:flex;gap:6px;padding:8px;
   }
   .actions button{
-    border:none;border-radius:6px;color:#fff;font-weight:700;font-size:13px;padding:11px 6px;cursor:pointer;flex:1;
+    border:none;border-radius:6px;color:#fff;font-weight:700;font-size:calc(13px * var(--fscale));padding:11px 6px;cursor:pointer;flex:1;
     display:flex;align-items:center;justify-content:center;gap:6px;
   }
-  .actions button.icon-only{flex:0 0 42px;font-size:15px;}
+  .actions button.icon-only{flex:0 0 42px;font-size:calc(15px * var(--fscale));}
   .btn-red{background:var(--red);}
   .btn-red:active{background:var(--red-dark);}
   .btn-orange{background:var(--orange);}
@@ -115,14 +123,14 @@
   /* ---------- CATEGORY CHIPS ---------- */
   .categories{display:flex;gap:8px;padding:6px 8px 10px;flex-wrap:wrap;}
   .chip{
-    border:1.5px solid #cfcfcf;background:#fff;border-radius:6px;padding:8px 16px;font-weight:700;font-size:13px;cursor:pointer;color:#444;
+    border:1.5px solid #cfcfcf;background:#fff;border-radius:6px;padding:8px 16px;font-weight:700;font-size:calc(13px * var(--fscale));cursor:pointer;color:#444;
   }
   .chip.active{background:var(--orange);border-color:var(--orange);color:#fff;}
 
   .search-row{padding:0 8px 10px;display:none;}
   .search-row.show{display:block;}
   .search-row input{
-    width:100%;border:1.5px solid #cfcfcf;border-radius:8px;padding:10px 12px;font-size:14px;background:#fff;
+    width:100%;border:1.5px solid #cfcfcf;border-radius:8px;padding:10px 12px;font-size:calc(14px * var(--fscale));background:#fff;
   }
 
   /* ---------- PRODUCT GRID ---------- */
@@ -135,20 +143,20 @@
     transition:transform .06s;position:relative;
   }
   .card:active{transform:scale(.96);background:#e0e0e0;}
-  .card .pname{font-weight:700;font-size:14.5px;line-height:1.2;padding-right:16px;}
-  .card .prate{color:var(--orange-dark);font-weight:700;font-size:14px;}
-  .card .edit-pencil{position:absolute;top:6px;right:6px;color:#999;font-size:11px;padding:4px;}
+  .card .pname{font-weight:700;font-size:calc(14.5px * var(--fscale));line-height:1.2;padding-right:16px;}
+  .card .prate{color:var(--orange-dark);font-weight:700;font-size:calc(14px * var(--fscale));}
+  .card .edit-pencil{position:absolute;top:6px;right:6px;color:#999;font-size:calc(11px * var(--fscale));padding:4px;}
   .card.add-new{align-items:center;justify-content:center;color:#888;border:1.5px dashed #bbb;background:transparent;}
 
   /* ---------- QUICK BILL ---------- */
   .qb-toprow{display:flex;gap:8px;padding:8px;align-items:center;}
   .qb-field{
-    flex:1;border:1.5px solid #cfcfcf;border-radius:8px;padding:11px 12px;font-size:14px;background:#fff;color:var(--dark);
+    flex:1;border:1.5px solid #cfcfcf;border-radius:8px;padding:11px 12px;font-size:calc(14px * var(--fscale));background:#fff;color:var(--dark);
   }
   .qb-field::placeholder{color:var(--hint);}
   .qb-field.active-field{border-color:var(--orange);box-shadow:0 0 0 2px rgba(235,156,58,.25);}
   .qb-icon-btn{
-    width:44px;height:44px;flex:0 0 44px;border:none;border-radius:8px;background:var(--gray);color:#fff;font-size:16px;cursor:pointer;
+    width:44px;height:44px;flex:0 0 44px;border:none;border-radius:8px;background:var(--gray);color:#fff;font-size:calc(16px * var(--fscale));cursor:pointer;
   }
   .qb-icon-btn.orange{background:var(--orange);}
   .qb-body{display:flex;flex:1;padding:0 8px 8px;gap:8px;overflow:hidden;}
@@ -156,15 +164,15 @@
     flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:10px;
   }
   .numpad button{
-    border:none;border-radius:50%;background:#e9e9e9;font-size:24px;font-weight:600;color:var(--dark);cursor:pointer;
+    border:none;border-radius:50%;background:#e9e9e9;font-size:calc(24px * var(--fscale));font-weight:600;color:var(--dark);cursor:pointer;
   }
   .numpad button:active{background:#dcdcdc;}
   .qb-sidebtns{width:88px;display:flex;flex-direction:column;gap:10px;}
   .qb-sidebtns button{
-    flex:1;border:none;border-radius:22px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;
+    flex:1;border:none;border-radius:22px;color:#fff;font-weight:700;font-size:calc(13px * var(--fscale));cursor:pointer;
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
   }
-  .qb-sidebtns button i{font-size:17px;}
+  .qb-sidebtns button i{font-size:calc(17px * var(--fscale));}
   .qb-save{background:var(--orange);}
   .qb-enter{background:var(--orange);flex:1.6 !important;}
   .qb-clear{background:var(--orange);}
@@ -179,24 +187,24 @@
   }
   .modal-sheet.centered{align-self:center;border-radius:14px;max-width:340px;margin:0 16px;}
   .modal-overlay.centered-overlay{align-items:center;}
-  .modal-title{font-size:17px;font-weight:800;margin:0 0 14px;display:flex;justify-content:space-between;align-items:center;}
-  .modal-title .close{color:#999;font-size:20px;cursor:pointer;}
-  .field-label{font-size:12px;font-weight:700;color:#777;margin:10px 0 4px;text-transform:uppercase;letter-spacing:.4px;}
-  .modal-input{width:100%;border:1.5px solid #d8d8d8;border-radius:8px;padding:10px 12px;font-size:14px;}
+  .modal-title{font-size:calc(17px * var(--fscale));font-weight:800;margin:0 0 14px;display:flex;justify-content:space-between;align-items:center;}
+  .modal-title .close{color:#999;font-size:calc(20px * var(--fscale));cursor:pointer;}
+  .field-label{font-size:calc(12px * var(--fscale));font-weight:700;color:#777;margin:10px 0 4px;text-transform:uppercase;letter-spacing:.4px;}
+  .modal-input{width:100%;border:1.5px solid #d8d8d8;border-radius:8px;padding:10px 12px;font-size:calc(14px * var(--fscale));}
   .modal-actions{display:flex;gap:10px;margin-top:18px;}
-  .modal-actions button{flex:1;border:none;border-radius:8px;padding:12px;font-weight:700;color:#fff;cursor:pointer;font-size:14px;}
-  .cat-toggle{display:flex;gap:8px;margin-top:6px;}
-  .cat-toggle button{flex:1;border:1.5px solid #d8d8d8;background:#fff;border-radius:8px;padding:9px;font-weight:700;color:#555;cursor:pointer;}
+  .modal-actions button{flex:1;border:none;border-radius:8px;padding:12px;font-weight:700;color:#fff;cursor:pointer;font-size:calc(14px * var(--fscale));}
+  .cat-toggle{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;}
+  .cat-toggle button{flex:1 1 auto;min-width:80px;border:1.5px solid #d8d8d8;background:#fff;border-radius:8px;padding:9px;font-weight:700;color:#555;cursor:pointer;}
   .cat-toggle button.sel{background:var(--orange);border-color:var(--orange);color:#fff;}
 
   /* bill report list */
   .bill-item{
     display:flex;justify-content:space-between;align-items:center;padding:12px 4px;border-bottom:1px solid #eee;
   }
-  .bill-item .meta{font-size:12px;color:#888;}
-  .bill-item .amt{font-weight:800;color:var(--orange-dark);font-size:15px;}
+  .bill-item .meta{font-size:calc(12px * var(--fscale));color:#888;}
+  .bill-item .amt{font-weight:800;color:var(--orange-dark);font-size:calc(15px * var(--fscale));}
   .bill-item .actbtns{display:flex;gap:8px;}
-  .bill-item .actbtns i{cursor:pointer;color:#666;font-size:15px;padding:4px;}
+  .bill-item .actbtns i{cursor:pointer;color:#666;font-size:calc(15px * var(--fscale));padding:4px;}
 
   /* receipt preview */
   #receiptPrintArea{
@@ -210,7 +218,7 @@
 
   .toast{
     position:absolute;bottom:18px;left:50%;transform:translateX(-50%);
-    background:#222;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;z-index:100;
+    background:#222;color:#fff;padding:10px 18px;border-radius:20px;font-size:calc(13px * var(--fscale));z-index:100;
     opacity:0;transition:opacity .25s;pointer-events:none;max-width:88%;text-align:center;
   }
   .toast.show{opacity:1;}
@@ -260,7 +268,6 @@
       <button class="btn-orange" onclick="openAddProduct()"><i class="fa-solid fa-plus"></i> Add Product</button>
       <button class="btn-gray" onclick="openPrintPreview()"><i class="fa-solid fa-print"></i> Print</button>
       <button class="btn-gray" onclick="saveBill()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-      <button class="btn-orange icon-only" onclick="toast('Barcode scanning needs a camera/scanner integration.')"><i class="fa-solid fa-barcode"></i></button>
       <button class="btn-orange icon-only" onclick="toggleSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
     </div>
 
@@ -280,7 +287,10 @@
       <input type="text" id="qbQty" class="qb-field active-field" placeholder="Qty" readonly onclick="setActiveField('qty')">
       <input type="text" id="qbRate" class="qb-field" placeholder="Rate" readonly onclick="setActiveField('rate')">
       <button class="qb-icon-btn" onclick="openBillReport()"><i class="fa-solid fa-file-invoice"></i></button>
-      <button class="qb-icon-btn orange" onclick="openPrintPreview()"><i class="fa-solid fa-print"></i></button>
+    </div>
+    <div class="actions" style="padding-top:0;">
+      <button class="btn-red" onclick="clearCart()"><i class="fa-solid fa-xmark"></i> Clear</button>
+      <button class="btn-gray" style="flex:1.4;" onclick="openPrintPreview()"><i class="fa-solid fa-print"></i> Print</button>
     </div>
     <div class="qb-body">
       <div class="numpad" id="numpad"></div>
@@ -307,6 +317,22 @@
       <div class="modal-actions">
         <button class="btn-orange" onclick="saveSettings()">Save</button>
       </div>
+
+      <div class="field-label" style="margin-top:18px;">Text Size</div>
+      <div class="modal-actions" style="margin-top:6px;align-items:center;">
+        <button class="btn-gray" style="flex:0 0 60px;" onclick="changeFontScale(-0.1)"><i class="fa-solid fa-minus"></i></button>
+        <div style="flex:1;text-align:center;font-weight:700;color:#555;" id="fontScaleLabel">100%</div>
+        <button class="btn-gray" style="flex:0 0 60px;" onclick="changeFontScale(0.1)"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <p style="font-size:11px;color:#999;margin-top:6px;line-height:1.4;">Changes text size across the whole app.</p>
+
+      <div class="field-label" style="margin-top:18px;">Categories</div>
+      <div id="categoryManageList" style="display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 8px;"></div>
+      <div class="modal-actions">
+        <input class="modal-input" id="newCatInput" placeholder="New category e.g. Beverages" style="flex:2;">
+        <button class="btn-orange" style="flex:1;" onclick="addCategory()">Add</button>
+      </div>
+
       <div class="field-label" style="margin-top:18px;">Items Data (JSON)</div>
       <div class="modal-actions" style="margin-top:6px;">
         <button class="btn-gray" onclick="exportItemsJSON()"><i class="fa-solid fa-file-export"></i>&nbsp; Export</button>
@@ -314,16 +340,15 @@
       </div>
       <input type="file" id="importFileInput" accept="application/json" class="hidden" onchange="importItemsJSON(event)">
       <p style="font-size:11px;color:#999;margin-top:8px;line-height:1.4;">
-        Items, prices and categories auto-save to this device as you add/edit them, and reload automatically next time you open this page. Export gives you a JSON file to back up or move to another device; Import loads a JSON file you exported before.
+        Items, prices and categories auto-save to this device as you add/edit them, and reload automatically next time you open this page. Export gives you a JSON file to back up or move to another device (includes your custom categories too); Import loads a JSON file you exported before.
       </p>
-      <div class="field-label" style="margin-top:18px;">Default Bluetooth Printer</div>
-      <div style="font-size:13px;color:#444;margin:4px 0 8px;" id="defaultPrinterLabel">Not set — Bluetooth Print will ask you to pick a device</div>
+
+      <div class="field-label" style="margin-top:18px;">Install App</div>
       <div class="modal-actions">
-        <button class="btn-orange" onclick="chooseBluetoothPrinter()"><i class="fa-brands fa-bluetooth-b"></i>&nbsp; Set / Change</button>
-        <button class="btn-gray" onclick="forgetBluetoothPrinter()"><i class="fa-solid fa-xmark"></i>&nbsp; Forget</button>
+        <button class="btn-green" id="installAppBtn" style="background:var(--green);" onclick="installApp()"><i class="fa-solid fa-mobile-screen-button"></i>&nbsp; Add to Home Screen</button>
       </div>
-      <p style="font-size:11px;color:#999;margin-top:8px;line-height:1.4;">
-        Once set, tapping Bluetooth Print reconnects to this printer automatically — no picker each time. Needs Chrome; if your browser doesn't support saved devices, it'll fall back to asking each time.
+      <p style="font-size:11px;color:#999;margin-top:8px;line-height:1.4;" id="installHint">
+        If the button doesn't do anything, use your browser's menu (⋮) and tap "Add to Home screen" or "Install app" — this works on any Chrome browser even without the button.
       </p>
     </div>
   </div>
@@ -338,10 +363,7 @@
       <div class="field-label">Price (₹)</div>
       <input class="modal-input" id="npPrice" type="number" inputmode="decimal" placeholder="e.g. 90">
       <div class="field-label">Category</div>
-      <div class="cat-toggle">
-        <button class="sel" id="npCatVeg" onclick="selectNewCat('veg')">VEG</button>
-        <button id="npCatNonveg" onclick="selectNewCat('nonveg')">NON VEG</button>
-      </div>
+      <div class="cat-toggle" id="npCatToggle"></div>
       <div class="modal-actions">
         <button class="btn-red hidden" id="npDeleteBtn" onclick="deleteProduct()"><i class="fa-solid fa-trash"></i>&nbsp; Delete</button>
         <button class="btn-orange" id="npSaveBtn" onclick="addProduct()">Add</button>
@@ -391,15 +413,21 @@ const DEFAULT_ITEMS = [
   {id:7, name:'VEG Thali', price:70, cat:'veg'},
 ];
 const CACHE_KEY = 'pos_cache_v1';
+const DEFAULT_CATEGORIES = [
+  {key:'nonveg', label:'NON VEG'},
+  {key:'veg', label:'VEG'},
+];
 let items = DEFAULT_ITEMS.slice();
+let categories = DEFAULT_CATEGORIES.slice();
 let nextItemId = 8;
 let activeCategory = 'all';
+let fontScale = 1;
 let mode = 'itemwise'; // 'itemwise' | 'quickbill'
 let cart = []; // itemwise: {id,name,rate,qty}
 let qbRows = []; // quickbill: {sr,details,qty,rate,total}
 let qbActiveField = 'qty';
 let qbNextSr = 1;
-let newProdCat = 'veg';
+let newProdCat = categories[0] ? categories[0].key : 'veg';
 let editingItemId = null; // null = "add" mode, otherwise editing this item id
 let billHistory = []; // {id, mode, ts, rows, total, qty}
 let shopCfg = {name:'My Canteen', address:'Bhubaneswar', phone:'', footer:'Thank you, visit again!'};
@@ -414,12 +442,16 @@ function loadFromCache(){
       items = data.items;
       nextItemId = Math.max(...items.map(i=>i.id), 0) + 1;
     }
+    if(Array.isArray(data.categories) && data.categories.length){
+      categories = data.categories;
+    }
     if(data.shopCfg) shopCfg = Object.assign(shopCfg, data.shopCfg);
+    if(typeof data.fontScale === 'number') fontScale = data.fontScale;
   }catch(e){ console.warn('Cache load failed', e); }
 }
 function saveToCache(){
   try{
-    localStorage.setItem(CACHE_KEY, JSON.stringify({items, shopCfg}));
+    localStorage.setItem(CACHE_KEY, JSON.stringify({items, categories, shopCfg, fontScale}));
   }catch(e){ console.warn('Cache save failed', e); }
 }
 
@@ -438,12 +470,66 @@ function renderGrid(filter){
 }
 
 function renderCategories(){
-  const cats = [{key:'all',label:'ALL'},{key:'nonveg',label:'NON VEG'},{key:'veg',label:'VEG'}];
+  const cats = [{key:'all',label:'ALL'}, ...categories];
   document.getElementById('categories').innerHTML = cats.map(c =>
-    `<div class="chip ${activeCategory===c.key?'active':''}" onclick="setCategory('${c.key}')">${c.label}</div>`
+    `<div class="chip ${activeCategory===c.key?'active':''}" onclick="setCategory('${c.key}')">${escapeHtml(c.label)}</div>`
   ).join('');
 }
 function setCategory(cat){ activeCategory = cat; renderCategories(); renderGrid(); }
+
+/* ---------------- FONT SIZE ---------------- */
+function applyFontScale(){
+  document.documentElement.style.setProperty('--fscale', fontScale);
+}
+function refreshFontScaleLabel(){
+  const lbl = document.getElementById('fontScaleLabel');
+  if(lbl) lbl.textContent = Math.round(fontScale*100)+'%';
+}
+function changeFontScale(delta){
+  fontScale = Math.min(1.5, Math.max(0.8, Math.round((fontScale+delta)*10)/10));
+  applyFontScale();
+  refreshFontScaleLabel();
+  saveToCache();
+}
+
+/* ---------------- CATEGORY MANAGEMENT ---------------- */
+function slugify(label){
+  return label.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || ('cat'+Date.now());
+}
+function renderCategoryManageList(){
+  const el = document.getElementById('categoryManageList');
+  if(!el) return;
+  el.innerHTML = categories.map(c => `
+    <span style="display:inline-flex;align-items:center;gap:6px;background:#eee;border-radius:16px;padding:6px 10px;font-size:calc(12px * var(--fscale));font-weight:700;">
+      ${escapeHtml(c.label)}
+      <i class="fa-solid fa-xmark" style="cursor:pointer;color:#999;" onclick="removeCategory('${c.key}')"></i>
+    </span>`).join('') || `<span style="color:#999;font-size:12px;">No categories yet</span>`;
+}
+function addCategory(){
+  const input = document.getElementById('newCatInput');
+  const label = input.value.trim();
+  if(!label){ toast('Enter a category name'); return; }
+  const key = slugify(label);
+  if(categories.some(c=>c.key===key)){ toast('Category already exists'); return; }
+  categories.push({key, label});
+  input.value = '';
+  saveToCache();
+  renderCategoryManageList();
+  renderCategories();
+  toast('Category added');
+}
+function removeCategory(key){
+  if(items.some(i=>i.cat===key)){
+    toast('Move or delete items using this category first');
+    return;
+  }
+  categories = categories.filter(c=>c.key!==key);
+  if(activeCategory===key) activeCategory = 'all';
+  saveToCache();
+  renderCategoryManageList();
+  renderCategories();
+  renderGrid();
+}
 
 function setupNumpad(){
   const keys = ['7','8','9','4','5','6','1','2','3','0','.',''];
@@ -569,7 +655,8 @@ function openAddProduct(){
   document.getElementById('npDeleteBtn').classList.add('hidden');
   document.getElementById('npName').value='';
   document.getElementById('npPrice').value='';
-  selectNewCat('veg');
+  renderNpCatToggle();
+  selectNewCat(categories[0] ? categories[0].key : null);
   showModal('addProductOverlay');
 }
 function openEditProduct(id){
@@ -581,18 +668,31 @@ function openEditProduct(id){
   document.getElementById('npDeleteBtn').classList.remove('hidden');
   document.getElementById('npName').value = it.name;
   document.getElementById('npPrice').value = it.price;
+  renderNpCatToggle();
   selectNewCat(it.cat);
   showModal('addProductOverlay');
 }
+function renderNpCatToggle(){
+  const el = document.getElementById('npCatToggle');
+  if(categories.length===0){
+    el.innerHTML = `<span style="color:#999;font-size:12px;">Add a category in Settings first</span>`;
+    return;
+  }
+  el.innerHTML = categories.map(c =>
+    `<button data-cat="${c.key}" onclick="selectNewCat('${c.key}')">${escapeHtml(c.label)}</button>`
+  ).join('');
+}
 function selectNewCat(c){
   newProdCat = c;
-  document.getElementById('npCatVeg').classList.toggle('sel', c==='veg');
-  document.getElementById('npCatNonveg').classList.toggle('sel', c==='nonveg');
+  document.querySelectorAll('#npCatToggle button').forEach(btn=>{
+    btn.classList.toggle('sel', btn.dataset.cat===c);
+  });
 }
 function addProduct(){
   const name = document.getElementById('npName').value.trim();
   const price = parseFloat(document.getElementById('npPrice').value);
   if(!name || !price || price<=0){ toast('Enter a valid name & price'); return; }
+  if(!newProdCat){ toast('Pick a category'); return; }
   if(editingItemId!=null){
     const it = items.find(i=>i.id===editingItemId);
     if(it){ it.name = name; it.price = price; it.cat = newProdCat; }
@@ -616,7 +716,7 @@ function deleteProduct(){
 
 /* ---------------- IMPORT / EXPORT JSON ---------------- */
 function exportItemsJSON(){
-  const payload = {exportedAt:new Date().toISOString(), items, shopCfg};
+  const payload = {exportedAt:new Date().toISOString(), items, categories, shopCfg};
   const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -637,16 +737,23 @@ function importItemsJSON(event){
       const data = JSON.parse(reader.result);
       const importedItems = Array.isArray(data) ? data : data.items;
       if(!Array.isArray(importedItems) || !importedItems.length) throw new Error('No items found in file');
+      let importedCats = Array.isArray(data.categories) ? data.categories.filter(c=>c && c.key && c.label) : null;
+      if(!importedCats || !importedCats.length) importedCats = DEFAULT_CATEGORIES.slice();
+      const validKeys = new Set(importedCats.map(c=>c.key));
+      const fallbackCat = importedCats[0].key;
       const clean = importedItems.map((it,idx) => ({
         id: Number.isFinite(it.id) ? it.id : idx+1,
         name: String(it.name||'Item'),
         price: parseFloat(it.price)||0,
-        cat: (it.cat==='veg'||it.cat==='nonveg') ? it.cat : 'veg'
+        cat: validKeys.has(it.cat) ? it.cat : fallbackCat
       }));
       items = clean;
+      categories = importedCats;
+      activeCategory = 'all';
       nextItemId = Math.max(...items.map(i=>i.id), 0) + 1;
       if(data.shopCfg) shopCfg = Object.assign(shopCfg, data.shopCfg);
       saveToCache();
+      renderCategories();
       renderGrid();
       toast('Items imported ('+items.length+')');
     }catch(e){
@@ -668,7 +775,8 @@ function openSettings(){
   document.getElementById('cfgAddress').value = shopCfg.address;
   document.getElementById('cfgPhone').value = shopCfg.phone;
   document.getElementById('cfgFooter').value = shopCfg.footer;
-  refreshDefaultPrinterLabel();
+  refreshFontScaleLabel();
+  renderCategoryManageList();
   showModal('settingsOverlay');
 }
 function saveSettings(){
@@ -779,66 +887,21 @@ function printViaRawBT(){
 }
 
 
-/* ---- Bluetooth ESC/POS printing (best-effort, generic thermal printers) ---- */
-const BT_ID_KEY = 'pos_bt_device_id';
-const BT_NAME_KEY = 'pos_bt_device_name';
+/* ---- Bluetooth ESC/POS printing (best-effort, generic BLE thermal printers) ---- */
 const BT_SERVICES = [
   '000018f0-0000-1000-8000-00805f9b34fb',
   '0000ff00-0000-1000-8000-00805f9b34fb',
   'e7810a71-73ae-499d-8c15-faa9aef0c3f2'
 ];
-function refreshDefaultPrinterLabel(){
-  const name = localStorage.getItem(BT_NAME_KEY);
-  document.getElementById('defaultPrinterLabel').textContent = name
-    ? ('Connected to: ' + name)
-    : 'Not set — Bluetooth Print will ask you to pick a device';
-}
-async function getSavedBluetoothDevice(){
-  const savedId = localStorage.getItem(BT_ID_KEY);
-  if(!savedId || !navigator.bluetooth || !navigator.bluetooth.getDevices) return null;
-  try{
-    const devices = await navigator.bluetooth.getDevices();
-    return devices.find(d=>d.id===savedId) || null;
-  }catch(e){ return null; }
-}
-function rememberBluetoothDevice(device){
-  try{
-    localStorage.setItem(BT_ID_KEY, device.id);
-    localStorage.setItem(BT_NAME_KEY, device.name || 'Printer');
-  }catch(e){ /* ignore */ }
-  refreshDefaultPrinterLabel();
-}
-async function chooseBluetoothPrinter(){
-  if(!navigator.bluetooth){ toast('Web Bluetooth not supported in this browser.'); return; }
-  try{
-    const device = await navigator.bluetooth.requestDevice({acceptAllDevices:true, optionalServices:BT_SERVICES});
-    rememberBluetoothDevice(device);
-    toast('Default printer set: '+(device.name||'Printer'));
-  }catch(e){
-    toast('No device selected');
-  }
-}
-function forgetBluetoothPrinter(){
-  localStorage.removeItem(BT_ID_KEY);
-  localStorage.removeItem(BT_NAME_KEY);
-  refreshDefaultPrinterLabel();
-  toast('Default printer forgotten');
-}
 async function printBluetooth(){
   if(!navigator.bluetooth){
     toast('Web Bluetooth not supported in this browser. Try Chrome on Android/desktop.');
     return;
   }
   try{
-    let device = await getSavedBluetoothDevice();
-    if(device){
-      toast('Connecting to '+(device.name||'saved printer')+'...');
-    } else {
-      device = await navigator.bluetooth.requestDevice({acceptAllDevices:true, optionalServices:BT_SERVICES});
-      toast('Connecting to '+(device.name||'printer')+'...');
-    }
+    const device = await navigator.bluetooth.requestDevice({acceptAllDevices:true, optionalServices:BT_SERVICES});
+    toast('Connecting to '+(device.name||'printer')+'...');
     const server = await device.gatt.connect();
-    rememberBluetoothDevice(device);
     let writeChar = null;
     for(const svcUuid of BT_SERVICES){
       try{
@@ -935,12 +998,45 @@ function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
+/* ---------------- INSTALL TO HOME SCREEN ---------------- */
+let deferredInstallPrompt = null;
+function setupInstallPrompt(){
+  window.addEventListener('beforeinstallprompt', (e)=>{
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    const hint = document.getElementById('installHint');
+    if(hint) hint.textContent = 'Ready to install — tap the button above.';
+  });
+  window.addEventListener('appinstalled', ()=>{
+    deferredInstallPrompt = null;
+    toast('App installed!');
+  });
+}
+async function installApp(){
+  if(deferredInstallPrompt){
+    deferredInstallPrompt.prompt();
+    const choice = await deferredInstallPrompt.userChoice;
+    if(choice.outcome==='accepted') toast('Installing...');
+    deferredInstallPrompt = null;
+  } else {
+    toast('Use your browser menu (⋮) → "Add to Home screen" / "Install app"');
+  }
+}
+function registerServiceWorker(){
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(()=>{ /* optional: app still works without it */ });
+  }
+}
+
 /* ---------------- BOOT ---------------- */
 loadFromCache();
+applyFontScale();
 renderCategories();
 renderGrid();
 setupNumpad();
 renderCart();
+setupInstallPrompt();
+registerServiceWorker();
 </script>
 </body>
 </html>
