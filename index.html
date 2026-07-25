@@ -82,7 +82,8 @@
 
   /* ---------- CART LIST ---------- */
   .cart-list{
-    flex:1;overflow-y:auto;background:var(--bg);min-height:60px;
+    overflow-y:auto;background:var(--bg);
+    height:calc(210px * var(--fscale));flex:0 0 auto;
   }
   .cart-row{
     display:flex;align-items:center;padding:10px 12px;font-size:calc(14px * var(--fscale));background:#fff;
@@ -278,7 +279,7 @@
     .topbar{grid-area:header;}
     #bodyColumn{grid-area:body;overflow-y:auto;min-height:0;}
     #cartColumn{grid-area:cart;border-left:1px solid #d2d2d2;min-height:0;overflow:hidden;}
-    #cartList{flex:1;overflow-y:auto;}
+    #cartList{flex:1;overflow-y:auto;height:auto;}
     #itemWisePanel{display:flex;flex-direction:column;flex:1;min-height:0;}
     .grid{grid-template-columns:repeat(4,1fr);overflow-y:auto;}
     .modal-sheet{max-width:480px;margin:0 auto;border-radius:14px;}
@@ -822,6 +823,7 @@ function renderCart(){
     document.getElementById('totalQty').textContent = totQty;
     document.getElementById('totalAmt').textContent = '₹'+totAmt.toFixed(0);
   }
+  listEl.scrollTop = listEl.scrollHeight;
 }
 function removeQbRow(sr){ qbRows = qbRows.filter(r=>r.sr!==sr); renderCart(); }
 
