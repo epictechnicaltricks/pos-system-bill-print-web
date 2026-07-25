@@ -84,7 +84,12 @@
   .cart-list{
     overflow-y:auto;background:var(--bg);
     height:calc(210px * var(--fscale));flex:0 0 auto;
+    scrollbar-width:thin;scrollbar-color:var(--orange) var(--bg);
   }
+  .cart-list::-webkit-scrollbar{width:8px;}
+  .cart-list::-webkit-scrollbar-track{background:var(--bg);}
+  .cart-list::-webkit-scrollbar-thumb{background:var(--orange);border-radius:4px;}
+  .cart-list::-webkit-scrollbar-thumb:hover{background:var(--orange-dark);}
   .cart-row{
     display:flex;align-items:center;padding:10px 12px;font-size:calc(14px * var(--fscale));background:#fff;
     border-bottom:1px solid #dcdcdc;
@@ -93,8 +98,12 @@
   .cart-row .qtybox{width:56px;display:flex;align-items:center;justify-content:center;gap:4px;}
   .cart-row .qtybox span{font-weight:700;font-size:calc(16px * var(--fscale));min-width:16px;text-align:center;}
   .cart-row .qtybox button{
-    width:20px;height:20px;border:none;border-radius:4px;background:var(--orange);color:#fff;font-size:calc(12px * var(--fscale));line-height:1;cursor:pointer;
+    width:20px;height:20px;border:none;border-radius:4px;color:#fff;font-size:calc(12px * var(--fscale));line-height:1;cursor:pointer;
   }
+  .cart-row .qtybox button.qty-minus{background:var(--red);}
+  .cart-row .qtybox button.qty-minus:active{background:var(--red-dark);}
+  .cart-row .qtybox button.qty-plus{background:var(--green);}
+  .cart-row .qtybox button.qty-plus:active{background:var(--green-dark);}
   .cart-row .rate{width:64px;text-align:right;color:#555;}
   .cart-row .total{width:72px;text-align:right;font-weight:800;font-size:calc(16px * var(--fscale));color:var(--orange-dark);}
   .cart-row .del{width:22px;text-align:center;color:var(--red);font-size:calc(13px * var(--fscale));cursor:pointer;margin-left:6px;}
@@ -791,9 +800,9 @@ function renderCart(){
         <div class="cart-row">
           <div class="name">${escapeHtml(c.name)}</div>
           <div class="qtybox">
-            <button onclick="changeQty(${c.id},-1)">-</button>
+            <button class="qty-minus" onclick="changeQty(${c.id},-1)">-</button>
             <span>${c.qty}</span>
-            <button onclick="changeQty(${c.id},1)">+</button>
+            <button class="qty-plus" onclick="changeQty(${c.id},1)">+</button>
           </div>
           <div class="rate">₹${c.rate}</div>
           <div class="total">₹${(c.rate*c.qty).toFixed(0)}</div>
