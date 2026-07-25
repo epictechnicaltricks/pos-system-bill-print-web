@@ -208,6 +208,15 @@
   .modal-title{font-size:calc(17px * var(--fscale));font-weight:800;margin:0 0 14px;display:flex;justify-content:space-between;align-items:center;}
   .modal-title .close{color:#999;font-size:calc(20px * var(--fscale));cursor:pointer;}
   .field-label{font-size:calc(12px * var(--fscale));font-weight:700;color:#777;margin:10px 0 4px;text-transform:uppercase;letter-spacing:.4px;}
+
+  /* Bill Report: full-screen on mobile instead of a bottom sheet, with a close button at top */
+  #billReportOverlay{align-items:stretch;}
+  #billReportOverlay .modal-sheet{
+    width:100%;height:100%;max-height:100%;border-radius:0;
+    display:flex;flex-direction:column;padding-top:calc(16px + env(safe-area-inset-top,0px));
+  }
+  #billReportOverlay .modal-title{flex:0 0 auto;}
+  #billReportOverlay #billReportList{flex:1;overflow-y:auto;}
   .modal-input{width:100%;border:1.5px solid #d8d8d8;border-radius:8px;padding:10px 12px;font-size:calc(14px * var(--fscale));}
   .modal-actions{display:flex;gap:10px;margin-top:18px;}
   .modal-actions button{flex:1;border:none;border-radius:8px;padding:12px;font-weight:700;color:#fff;cursor:pointer;font-size:calc(14px * var(--fscale));}
@@ -271,6 +280,7 @@
     .grid{grid-template-columns:repeat(4,1fr);}
     .modal-sheet{max-width:480px;margin:0 auto;border-radius:14px;}
     .modal-overlay{align-items:center;}
+    #billReportOverlay .modal-sheet{width:100%;max-width:480px;height:auto;max-height:88%;border-radius:14px;padding-top:18px;}
   }
 
   /* ---------- RESPONSIVE: DESKTOP (two-pane, cart as sidebar) ---------- */
@@ -293,6 +303,7 @@
     .grid{grid-template-columns:repeat(4,1fr);overflow-y:auto;}
     .modal-sheet{max-width:480px;margin:0 auto;border-radius:14px;}
     .modal-overlay{align-items:center;}
+    #billReportOverlay .modal-sheet{width:100%;max-width:480px;height:auto;max-height:88%;border-radius:14px;padding-top:18px;}
   }
   @media (min-width:1300px){
     #app{max-width:1360px;}
@@ -1004,6 +1015,7 @@ function currentBillRows(){
 function addBillToHistory(rows, total, ts){
   const qty = rows.reduce((s,r)=>s+r.qty,0);
   billHistory.unshift({id:Date.now(), mode, ts, rows, total, qty});
+  saveToCache();
 }
 function dayKey(ts){ return ts.toLocaleDateString('en-GB'); } // dd/mm/yyyy, stable grouping key
 function groupHistoryByDate(){
