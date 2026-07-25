@@ -223,6 +223,11 @@
     color:#555;border-bottom:1px dashed #e2e2e2;
   }
   .bill-details .rc-row:last-child{border-bottom:none;}
+  .wa-btn-sm{
+    width:34px;height:34px;border-radius:50%;background:var(--green);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;flex-shrink:0;
+  }
+  .wa-btn-sm:active{background:var(--green-dark);}
 
   .toast{
     position:absolute;bottom:18px;left:50%;transform:translateX(-50%);
@@ -440,7 +445,7 @@
     <div class="modal-sheet">
       <div class="modal-title"><span>Bill Report</span><span class="close" onclick="closeModal('billReportOverlay')">&times;</span></div>
       <div class="modal-actions" style="margin-bottom:12px;">
-        <button class="btn-green" style="background:var(--green);" onclick="shareToWhatsApp()"><i class="fa-brands fa-whatsapp"></i>&nbsp; Share Full 7-Day Report</button>
+        <button class="btn-green" style="background:var(--green);" onclick="shareFullReportCSV()"><i class="fa-brands fa-whatsapp"></i>&nbsp; Share Full 7-Day Report (CSV)</button>
       </div>
       <div id="billReportList"></div>
     </div>
@@ -1016,7 +1021,7 @@ function openBillReport(){
           <span style="font-weight:800;">${g.dateLabel}</span>
           <div style="display:flex;align-items:center;gap:14px;">
             <span style="font-weight:800;color:var(--orange-dark);">₹${g.total.toFixed(0)}</span>
-            <i class="fa-brands fa-whatsapp" style="cursor:pointer;color:var(--green);font-size:17px;" title="Share this date" onclick="shareToWhatsApp('${g.dateLabel}')"></i>
+            <div class="wa-btn-sm" title="Share this date" onclick="shareToWhatsApp('${g.dateLabel}')"><i class="fa-brands fa-whatsapp"></i></div>
           </div>
         </div>
         ${g.bills.map(b => `
@@ -1166,7 +1171,8 @@ async function printBluetooth(){
   }
 }
 
-/* ---------------- WHATSAPP SHARE (bill history, full item detail, no export/download) ---------------- */
+/* ---------------- WHATSAPP SHARE (bill history) ---------------- */
+/* Single-day share: plain text message with full item detail per bill */
 function buildBillShareText(dateKey){
   const groups = groupHistoryByDate().filter(g => !dateKey || g.dateLabel === dateKey);
   if(groups.length===0) return '';
@@ -1195,6 +1201,43 @@ function shareToWhatsApp(dateKey){
   const text = buildBillShareText(dateKey);
   if(!text){ toast('No bills for this date'); return; }
   window.open('https://wa.me/?text='+encodeURIComponent(text), '_blank');
+}
+
+/* Full 7-day report share: CSV file, with full item detail, shared as a file */
+function buildHistoryCSV(){
+  const groups = groupHistoryByDate();
+  const rows = ['Date,Time,Item,Qty,Rate,Item Total,Bill Total'];
+  groups.forEach(g=>{
+    g.bills.forEach(b=>{
+      b.rows.forEach((r,i)=>{
+        rows.push(`"${g.dateLabel}","${b.ts.toLocaleTimeString()}","${r.name.replace(/"/g,'""')}",${r.qty},${r.rate},${r.total.toFixed(0)},${i===0?b.total.toFixed(0):''}`);
+      });
+    });
+    rows.push(`"${g.dateLabel} TOTAL",,,,,,${g.total.toFixed(0)}`);
+    rows.push('');
+  });
+  return rows.join('\n');
+}
+async function shareFullReportCSV(){
+  if(billHistory.length===0){ toast('No bill history yet'); return; }
+  const csv = buildHistoryCSV();
+  const filename = 'bill-report-7days-'+new Date().toISOString().slice(0,10)+'.csv';
+  const blob = new Blob([csv], {type:'text/csv'});
+  const file = new File([blob], filename, {type:'text/csv'});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{
+      await navigator.share({files:[file], title:'Bill Report (7 Days)'});
+      return;
+    }catch(e){ /* user cancelled the share sheet — nothing further to do */ return; }
+  }
+  // Fallback for browsers without file-sharing support: download the CSV, then open WhatsApp so it can be attached manually.
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast('CSV downloaded — attach it in WhatsApp');
+  window.open('https://wa.me/?text='+encodeURIComponent('7-day bill report CSV downloaded — please attach it here.'), '_blank');
 }
 
 
