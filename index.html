@@ -18,6 +18,7 @@
     --bg:#e3e3e3;
     --orange:#eb9c3a;
     --orange-dark:#d6862a;
+    --orange-rgb:235,156,58;
     --green:#3fa64a;
     --green-dark:#358f40;
     --red:#e0432f;
@@ -162,7 +163,7 @@
     flex:1;border:1.5px solid #cfcfcf;border-radius:8px;padding:11px 12px;font-size:calc(14px * var(--fscale));background:#fff;color:var(--dark);
   }
   .qb-field::placeholder{color:var(--hint);}
-  .qb-field.active-field{border-color:var(--orange);box-shadow:0 0 0 2px rgba(235,156,58,.25);}
+  .qb-field.active-field{border-color:var(--orange);box-shadow:0 0 0 2px rgba(var(--orange-rgb),.25);}
   .qb-icon-btn{
     width:44px;height:44px;flex:0 0 44px;border:none;border-radius:8px;background:var(--gray);color:#fff;font-size:calc(16px * var(--fscale));cursor:pointer;
   }
@@ -352,12 +353,19 @@
       <div class="modal-title"><span>Shop Details</span><span class="close" onclick="closeModal('settingsOverlay')">&times;</span></div>
       <div class="field-label">Shop Name</div>
       <input class="modal-input" id="cfgName" value="My Canteen">
+      <div class="field-label">Bill Title</div>
+      <input class="modal-input" id="cfgBillTitle" value="Item Wise Bill" placeholder="e.g. My Canteen Bill">
       <div class="field-label">Address</div>
       <input class="modal-input" id="cfgAddress" value="Bhubaneswar">
       <div class="field-label">Phone</div>
       <input class="modal-input" id="cfgPhone" value="">
       <div class="field-label">Footer note</div>
       <input class="modal-input" id="cfgFooter" value="Thank you, visit again!">
+      <div class="field-label">Theme Color</div>
+      <div class="modal-actions" style="margin-top:6px;align-items:center;">
+        <input type="color" id="cfgThemeColor" value="#eb9c3a" style="width:50px;height:40px;border:1.5px solid #d8d8d8;border-radius:8px;padding:2px;flex:0 0 50px;cursor:pointer;">
+        <div style="flex:1;color:#777;font-size:12px;">Tap to pick any color for buttons, tabs &amp; highlights</div>
+      </div>
       <div class="modal-actions">
         <button class="btn-orange" onclick="saveSettings()">Save</button>
       </div>
@@ -510,7 +518,7 @@ let qbNextSr = 1;
 let newProdCat = categories[0] ? categories[0].key : 'veg';
 let editingItemId = null; // null = "add" mode, otherwise editing this item id
 let billHistory = []; // {id, mode, ts, rows, total, qty}
-let shopCfg = {name:'My Canteen', address:'Bhubaneswar', phone:'', footer:'Thank you, visit again!'};
+let shopCfg = {name:'My Canteen', address:'Bhubaneswar', phone:'', footer:'Thank you, visit again!', billTitle:'Item Wise Bill', themeColor:'#eb9c3a'};
 
 const BILL_HISTORY_MAX_DAYS = 7;
 /* ---------------- CACHE (auto-save / auto-load on this device) ---------------- */
@@ -607,6 +615,39 @@ function changeFontScale(delta){
   saveToCache();
 }
 
+/* ---------------- THEME COLOR ---------------- */
+function shadeColor(hex, percent){ // percent negative = darker, positive = lighter
+  const num = parseInt(hex.replace('#',''),16);
+  let r = (num>>16) + Math.round(255*percent/100);
+  let g = ((num>>8)&0x00FF) + Math.round(255*percent/100);
+  let b = (num&0x0000FF) + Math.round(255*percent/100);
+  r = Math.min(255,Math.max(0,r)); g = Math.min(255,Math.max(0,g)); b = Math.min(255,Math.max(0,b));
+  return '#'+(0x1000000+r*0x10000+g*0x100+b).toString(16).slice(1);
+}
+function hexToRgbString(hex){
+  const num = parseInt(hex.replace('#',''),16);
+  return `${(num>>16)&255},${(num>>8)&255},${num&255}`;
+}
+function applyThemeColor(){
+  const color = shopCfg.themeColor || '#eb9c3a';
+  const root = document.documentElement.style;
+  root.setProperty('--orange', color);
+  root.setProperty('--orange-dark', shadeColor(color, -15));
+  root.setProperty('--orange-rgb', hexToRgbString(color));
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if(metaTheme) metaTheme.setAttribute('content', color);
+}
+
+/* ---------------- BILL TITLE ---------------- */
+function applyBillTitle(){
+  if(mode === 'itemwise'){
+    document.getElementById('modeTitle').textContent = shopCfg.billTitle || 'Item Wise Bill';
+    document.getElementById('switchModeBtn').textContent = 'Quick Bill';
+  } else {
+    document.getElementById('switchModeBtn').textContent = shopCfg.billTitle || 'Item Wise Bill';
+  }
+}
+
 /* ---------------- CATEGORY MANAGEMENT ---------------- */
 function slugify(label){
   return label.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || ('cat'+Date.now());
@@ -656,8 +697,7 @@ function setupNumpad(){
 function switchMode(){
   mode = (mode==='itemwise') ? 'quickbill' : 'itemwise';
   const isItem = mode==='itemwise';
-  document.getElementById('modeTitle').textContent = isItem ? 'Item Wise Bill' : 'Quick Bill';
-  document.getElementById('switchModeBtn').textContent = isItem ? 'Quick Bill' : 'Item Wise Bill';
+  applyBillTitle();
   document.getElementById('tableHeadItemWise').classList.toggle('hidden', !isItem);
   document.getElementById('tableHeadQuick').classList.toggle('hidden', isItem);
   document.getElementById('itemWisePanel').classList.toggle('hidden', !isItem);
@@ -906,9 +946,11 @@ function toggleSearch(){
 /* ---------------- SETTINGS ---------------- */
 function openSettings(){
   document.getElementById('cfgName').value = shopCfg.name;
+  document.getElementById('cfgBillTitle').value = shopCfg.billTitle || 'Item Wise Bill';
   document.getElementById('cfgAddress').value = shopCfg.address;
   document.getElementById('cfgPhone').value = shopCfg.phone;
   document.getElementById('cfgFooter').value = shopCfg.footer;
+  document.getElementById('cfgThemeColor').value = shopCfg.themeColor || '#eb9c3a';
   refreshFontScaleLabel();
   renderCategoryManageList();
   showModal('settingsOverlay');
@@ -916,10 +958,14 @@ function openSettings(){
 function saveSettings(){
   shopCfg = {
     name: document.getElementById('cfgName').value.trim() || 'My Shop',
+    billTitle: document.getElementById('cfgBillTitle').value.trim() || 'Item Wise Bill',
     address: document.getElementById('cfgAddress').value.trim(),
     phone: document.getElementById('cfgPhone').value.trim(),
     footer: document.getElementById('cfgFooter').value.trim(),
+    themeColor: document.getElementById('cfgThemeColor').value || '#eb9c3a',
   };
+  applyThemeColor();
+  applyBillTitle();
   saveToCache();
   closeModal('settingsOverlay');
   toast('Settings saved');
@@ -1252,6 +1298,8 @@ function registerServiceWorker(){
 /* ---------------- BOOT ---------------- */
 loadFromCache();
 applyFontScale();
+applyThemeColor();
+applyBillTitle();
 renderCategories();
 renderGrid();
 setupNumpad();
