@@ -213,6 +213,16 @@
   .bill-item .amt{font-weight:800;color:var(--orange-dark);font-size:calc(15px * var(--fscale));}
   .bill-item .actbtns{display:flex;gap:8px;}
   .bill-item .actbtns i{cursor:pointer;color:#666;font-size:calc(15px * var(--fscale));padding:4px;}
+  .bill-item .actbtns i.chev{transition:transform .2s;}
+  .bill-item .actbtns i.chev.open{transform:rotate(180deg);}
+  .bill-details{
+    background:#fafafa;border-radius:6px;padding:2px 10px;margin:-2px 0 6px;
+  }
+  .bill-details .rc-row{
+    display:flex;justify-content:space-between;gap:8px;padding:5px 2px;font-size:calc(12.5px * var(--fscale));
+    color:#555;border-bottom:1px dashed #e2e2e2;
+  }
+  .bill-details .rc-row:last-child{border-bottom:none;}
 
   .toast{
     position:absolute;bottom:18px;left:50%;transform:translateX(-50%);
@@ -430,8 +440,7 @@
     <div class="modal-sheet">
       <div class="modal-title"><span>Bill Report</span><span class="close" onclick="closeModal('billReportOverlay')">&times;</span></div>
       <div class="modal-actions" style="margin-bottom:12px;">
-        <button class="btn-gray" onclick="exportHistoryCSV()"><i class="fa-solid fa-file-csv"></i>&nbsp; Export All (7 Days)</button>
-        <button class="btn-green" style="background:var(--green);" onclick="shareHistoryToWhatsApp()"><i class="fa-brands fa-whatsapp"></i>&nbsp; Share to WhatsApp</button>
+        <button class="btn-green" style="background:var(--green);" onclick="shareToWhatsApp()"><i class="fa-brands fa-whatsapp"></i>&nbsp; Share Full 7-Day Report</button>
       </div>
       <div id="billReportList"></div>
     </div>
@@ -1005,32 +1014,38 @@ function openBillReport(){
       <div style="margin-top:10px;">
         <div style="display:flex;justify-content:space-between;align-items:center;background:#f2f2f2;border-radius:8px;padding:8px 12px;margin-bottom:4px;">
           <span style="font-weight:800;">${g.dateLabel}</span>
-          <div style="display:flex;align-items:center;gap:12px;">
+          <div style="display:flex;align-items:center;gap:14px;">
             <span style="font-weight:800;color:var(--orange-dark);">₹${g.total.toFixed(0)}</span>
-            <i class="fa-solid fa-file-csv" style="cursor:pointer;color:#666;font-size:15px;" title="Export this date" onclick="exportHistoryCSV('${g.dateLabel}')"></i>
+            <i class="fa-brands fa-whatsapp" style="cursor:pointer;color:var(--green);font-size:17px;" title="Share this date" onclick="shareToWhatsApp('${g.dateLabel}')"></i>
           </div>
         </div>
         ${g.bills.map(b => `
-          <div class="bill-item">
+          <div class="bill-item" style="cursor:pointer;" onclick="toggleBillDetails(${b.id})">
             <div>
               <div class="amt">₹${b.total.toFixed(0)}</div>
               <div class="meta">${b.ts.toLocaleTimeString()} · ${b.qty} items</div>
             </div>
             <div class="actbtns">
-              <i class="fa-solid fa-print" onclick="printSavedBill(${b.id})"></i>
-              <i class="fa-solid fa-trash" onclick="deleteBill(${b.id})"></i>
+              <i class="fa-solid fa-chevron-down chev" id="chev-${b.id}"></i>
             </div>
+          </div>
+          <div class="bill-details hidden" id="det-${b.id}">
+            ${b.rows.map(r => `
+              <div class="rc-row">
+                <span>${escapeHtml(r.name)} <span style="color:#999;">x${r.qty}</span></span>
+                <span>₹${r.total.toFixed(0)}</span>
+              </div>`).join('')}
           </div>`).join('')}
       </div>`).join('');
   }
   showModal('billReportOverlay');
 }
-function deleteBill(id){ billHistory = billHistory.filter(b=>b.id!==id); openBillReport(); }
-function printSavedBill(id){
-  const b = billHistory.find(x=>x.id===id);
-  if(!b) return;
-  printViaRawBT(b.rows, b.total, b.ts);
-  toast('Reprinting...');
+function toggleBillDetails(id){
+  const det = document.getElementById('det-'+id);
+  const chev = document.getElementById('chev-'+id);
+  if(!det) return;
+  det.classList.toggle('hidden');
+  if(chev) chev.classList.toggle('open');
 }
 
 /* ---------------- RECEIPT PREVIEW / PRINT DIALOG ---------------- */
@@ -1151,50 +1166,37 @@ async function printBluetooth(){
   }
 }
 
-/* ---------------- CSV EXPORT / WHATSAPP SHARE (bill history) ---------------- */
-function buildHistoryCSV(dateKey){
+/* ---------------- WHATSAPP SHARE (bill history, full item detail, no export/download) ---------------- */
+function buildBillShareText(dateKey){
   const groups = groupHistoryByDate().filter(g => !dateKey || g.dateLabel === dateKey);
-  const rows = ['Date,Time,Items,Total'];
+  if(groups.length===0) return '';
+  const lines = [`*${shopCfg.name} — Bill Report*`];
+  let grand = 0;
   groups.forEach(g=>{
+    lines.push('');
+    lines.push(`📅 *${g.dateLabel}*`);
     g.bills.forEach(b=>{
-      const itemsStr = b.rows.map(r=>`${r.name} x${r.qty} @${r.rate}`).join('; ').replace(/"/g,'""');
-      rows.push(`"${g.dateLabel}","${b.ts.toLocaleTimeString()}","${itemsStr}",${b.total.toFixed(0)}`);
+      lines.push(`— ${b.ts.toLocaleTimeString()} · ₹${b.total.toFixed(0)} (${b.qty} items)`);
+      b.rows.forEach(r=>{
+        lines.push(`   ${r.name} x${r.qty} @₹${r.rate} = ₹${r.total.toFixed(0)}`);
+      });
     });
-    rows.push(`,,"${g.dateLabel} TOTAL",${g.total.toFixed(0)}`);
-    rows.push('');
+    lines.push(`*Day Total: ₹${g.total.toFixed(0)}*`);
+    grand += g.total;
   });
-  return rows.join('\n');
-}
-function exportHistoryCSV(dateKey){
-  if(billHistory.length===0){ toast('No bill history yet'); return; }
-  const csv = buildHistoryCSV(dateKey);
-  const blob = new Blob([csv], {type:'text/csv'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = (dateKey ? 'bill-history-'+dateKey.replace(/\//g,'-') : 'bill-history-'+new Date().toISOString().slice(0,10))+'.csv';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-}
-async function shareHistoryToWhatsApp(){
-  if(billHistory.length===0){ toast('No bill history yet'); return; }
-  const csv = buildHistoryCSV();
-  const blob = new Blob([csv], {type:'text/csv'});
-  const file = new File([blob], 'bill-history.csv', {type:'text/csv'});
-  if(navigator.canShare && navigator.canShare({files:[file]})){
-    try{
-      await navigator.share({files:[file], title:'Bill History', text:'Bill history export'});
-      return;
-    }catch(e){ /* user cancelled — fall through to link fallback below */ }
+  if(groups.length>1){
+    lines.push('');
+    lines.push(`*Grand Total (${groups.length} days): ₹${grand.toFixed(0)}*`);
   }
-  exportHistoryCSV();
-  const groups = groupHistoryByDate();
-  const grand = groups.reduce((s,g)=>s+g.total,0);
-  const summary = `Bill history (${groups.length} day${groups.length===1?'':'s'}, total ₹${grand.toFixed(0)}) — CSV downloaded, please attach it here.`;
-  window.open('https://wa.me/?text='+encodeURIComponent(summary), '_blank');
+  return lines.join('\n');
 }
+function shareToWhatsApp(dateKey){
+  if(billHistory.length===0){ toast('No bill history yet'); return; }
+  const text = buildBillShareText(dateKey);
+  if(!text){ toast('No bills for this date'); return; }
+  window.open('https://wa.me/?text='+encodeURIComponent(text), '_blank');
+}
+
 
 function encodeReceiptESCPOS(rows, total, ts){
   const enc = new TextEncoder();
