@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>POS Billing</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  :root{
+    --bg:#e3e3e3;
+    --orange:#eb9c3a;
+    --orange-dark:#d6862a;
+    --green:#3fa64a;
+    --green-dark:#358f40;
+    --red:#e0432f;
+    --red-dark:#c73a29;
+    --gray:#9c9c9c;
+    --gray-dark:#828282;
+    --dark:#222;
+    --card-bg:#ececec;
+    --white:#fff;
+    --hint:#9a9a9a;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;background:#000;}
+  body{
+    font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    color:var(--dark);
+  }
+  #app{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    background:var(--bg);
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    overflow:hidden;
+  }
+  /* ---------- HEADER ---------- */
+  .topbar{
+    display:flex;align-items:center;gap:10px;
+    padding:14px 12px 10px;
+  }
+  .topbar .menu-btn{
+    background:none;border:none;font-size:20px;color:var(--dark);padding:4px;cursor:pointer;
+  }
+  .topbar h1{
+    flex:1;font-size:19px;font-weight:700;margin:0;letter-spacing:.2px;
+  }
+  .pill-btn{
+    border:none;border-radius:8px;padding:9px 14px;font-weight:700;font-size:13px;color:#fff;cursor:pointer;white-space:nowrap;
+  }
+  .pill-orange{background:var(--orange);}
+  .pill-orange:active{background:var(--orange-dark);}
+  .pill-green{background:var(--green);}
+  .pill-green:active{background:var(--green-dark);}
+
+  /* ---------- TABLE HEADER ---------- */
+  .table-head{
+    display:flex;background:var(--orange);color:#fff;font-weight:700;font-size:13px;
+    padding:11px 12px;letter-spacing:.3px;
+  }
+  .table-head span{text-align:right;}
+  .table-head span:first-child{text-align:left;flex:1;}
+  .col-qty{width:56px;}
+  .col-rate{width:64px;}
+  .col-total{width:72px;}
+  .col-sr{width:30px;text-align:left !important;}
+  .col-details{flex:1;text-align:left !important;}
+
+  /* ---------- CART LIST ---------- */
+  .cart-list{
+    flex:1;overflow-y:auto;background:var(--bg);min-height:60px;
+  }
+  .cart-row{
+    display:flex;align-items:center;padding:10px 12px;font-size:14px;background:#fff;
+    border-bottom:1px solid #dcdcdc;
+  }
+  .cart-row .name{flex:1;font-weight:600;}
+  .cart-row .qtybox{width:56px;display:flex;align-items:center;justify-content:center;gap:4px;}
+  .cart-row .qtybox button{
+    width:20px;height:20px;border:none;border-radius:4px;background:var(--orange);color:#fff;font-size:12px;line-height:1;cursor:pointer;
+  }
+  .cart-row .rate{width:64px;text-align:right;color:#555;}
+  .cart-row .total{width:72px;text-align:right;font-weight:700;color:var(--orange-dark);}
+  .cart-row .del{width:22px;text-align:center;color:var(--red);font-size:13px;cursor:pointer;margin-left:6px;}
+  .cart-empty{
+    text-align:center;color:#999;padding:40px 20px;font-size:13px;
+  }
+
+  /* ---------- TOTAL BAR ---------- */
+  .totalbar{
+    display:flex;justify-content:space-between;align-items:center;
+    background:var(--gray);color:#fff;font-weight:700;font-size:16px;
+    padding:12px 16px;
+  }
+
+  /* ---------- ACTION ROW (item wise) ---------- */
+  .actions{
+    display:flex;gap:6px;padding:8px;
+  }
+  .actions button{
+    border:none;border-radius:6px;color:#fff;font-weight:700;font-size:13px;padding:11px 6px;cursor:pointer;flex:1;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+  }
+  .actions button.icon-only{flex:0 0 42px;font-size:15px;}
+  .btn-red{background:var(--red);}
+  .btn-red:active{background:var(--red-dark);}
+  .btn-orange{background:var(--orange);}
+  .btn-orange:active{background:var(--orange-dark);}
+  .btn-gray{background:var(--gray);}
+  .btn-gray:active{background:var(--gray-dark);}
+
+  /* ---------- CATEGORY CHIPS ---------- */
+  .categories{display:flex;gap:8px;padding:6px 8px 10px;flex-wrap:wrap;}
+  .chip{
+    border:1.5px solid #cfcfcf;background:#fff;border-radius:6px;padding:8px 16px;font-weight:700;font-size:13px;cursor:pointer;color:#444;
+  }
+  .chip.active{background:var(--orange);border-color:var(--orange);color:#fff;}
+
+  .search-row{padding:0 8px 10px;display:none;}
+  .search-row.show{display:block;}
+  .search-row input{
+    width:100%;border:1.5px solid #cfcfcf;border-radius:8px;padding:10px 12px;font-size:14px;background:#fff;
+  }
+
+  /* ---------- PRODUCT GRID ---------- */
+  .grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 8px 16px;overflow-y:auto;
+  }
+  .card{
+    background:var(--card-bg);border-radius:8px;padding:12px 10px;cursor:pointer;user-select:none;
+    display:flex;flex-direction:column;gap:6px;min-height:64px;justify-content:center;
+    transition:transform .06s;position:relative;
+  }
+  .card:active{transform:scale(.96);background:#e0e0e0;}
+  .card .pname{font-weight:700;font-size:14.5px;line-height:1.2;padding-right:16px;}
+  .card .prate{color:var(--orange-dark);font-weight:700;font-size:14px;}
+  .card .edit-pencil{position:absolute;top:6px;right:6px;color:#999;font-size:11px;padding:4px;}
+  .card.add-new{align-items:center;justify-content:center;color:#888;border:1.5px dashed #bbb;background:transparent;}
+
+  /* ---------- QUICK BILL ---------- */
+  .qb-toprow{display:flex;gap:8px;padding:8px;align-items:center;}
+  .qb-field{
+    flex:1;border:1.5px solid #cfcfcf;border-radius:8px;padding:11px 12px;font-size:14px;background:#fff;color:var(--dark);
+  }
+  .qb-field::placeholder{color:var(--hint);}
+  .qb-field.active-field{border-color:var(--orange);box-shadow:0 0 0 2px rgba(235,156,58,.25);}
+  .qb-icon-btn{
+    width:44px;height:44px;flex:0 0 44px;border:none;border-radius:8px;background:var(--gray);color:#fff;font-size:16px;cursor:pointer;
+  }
+  .qb-icon-btn.orange{background:var(--orange);}
+  .qb-body{display:flex;flex:1;padding:0 8px 8px;gap:8px;overflow:hidden;}
+  .numpad{
+    flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);gap:10px;
+  }
+  .numpad button{
+    border:none;border-radius:50%;background:#e9e9e9;font-size:24px;font-weight:600;color:var(--dark);cursor:pointer;
+  }
+  .numpad button:active{background:#dcdcdc;}
+  .qb-sidebtns{width:88px;display:flex;flex-direction:column;gap:10px;}
+  .qb-sidebtns button{
+    flex:1;border:none;border-radius:22px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  }
+  .qb-sidebtns button i{font-size:17px;}
+  .qb-save{background:var(--orange);}
+  .qb-enter{background:var(--orange);flex:1.6 !important;}
+  .qb-clear{background:var(--orange);}
+
+  /* ---------- MODALS ---------- */
+  .modal-overlay{
+    position:absolute;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:50;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-sheet{
+    background:#fff;width:100%;max-height:88%;border-radius:16px 16px 0 0;padding:18px 16px 20px;overflow-y:auto;
+  }
+  .modal-sheet.centered{align-self:center;border-radius:14px;max-width:340px;margin:0 16px;}
+  .modal-overlay.centered-overlay{align-items:center;}
+  .modal-title{font-size:17px;font-weight:800;margin:0 0 14px;display:flex;justify-content:space-between;align-items:center;}
+  .modal-title .close{color:#999;font-size:20px;cursor:pointer;}
+  .field-label{font-size:12px;font-weight:700;color:#777;margin:10px 0 4px;text-transform:uppercase;letter-spacing:.4px;}
+  .modal-input{width:100%;border:1.5px solid #d8d8d8;border-radius:8px;padding:10px 12px;font-size:14px;}
+  .modal-actions{display:flex;gap:10px;margin-top:18px;}
+  .modal-actions button{flex:1;border:none;border-radius:8px;padding:12px;font-weight:700;color:#fff;cursor:pointer;font-size:14px;}
+  .cat-toggle{display:flex;gap:8px;margin-top:6px;}
+  .cat-toggle button{flex:1;border:1.5px solid #d8d8d8;background:#fff;border-radius:8px;padding:9px;font-weight:700;color:#555;cursor:pointer;}
+  .cat-toggle button.sel{background:var(--orange);border-color:var(--orange);color:#fff;}
+
+  /* bill report list */
+  .bill-item{
+    display:flex;justify-content:space-between;align-items:center;padding:12px 4px;border-bottom:1px solid #eee;
+  }
+  .bill-item .meta{font-size:12px;color:#888;}
+  .bill-item .amt{font-weight:800;color:var(--orange-dark);font-size:15px;}
+  .bill-item .actbtns{display:flex;gap:8px;}
+  .bill-item .actbtns i{cursor:pointer;color:#666;font-size:15px;padding:4px;}
+
+  /* receipt preview */
+  #receiptPrintArea{
+    font-family:'Courier New',monospace;background:#fff;padding:8px 6px;width:100%;font-size:10.5px;line-height:1.3;color:#000;
+  }
+  #receiptPrintArea .rc-center{text-align:center;}
+  #receiptPrintArea .rc-bold{font-weight:700;}
+  #receiptPrintArea .rc-line{border-top:1px dashed #000;margin:3px 0;}
+  #receiptPrintArea .rc-row{display:flex;justify-content:space-between;gap:4px;}
+  #receiptPrintArea .rc-row span:first-child{flex:1;}
+
+  .toast{
+    position:absolute;bottom:18px;left:50%;transform:translateX(-50%);
+    background:#222;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;z-index:100;
+    opacity:0;transition:opacity .25s;pointer-events:none;max-width:88%;text-align:center;
+  }
+  .toast.show{opacity:1;}
+
+  .hidden{display:none !important;}
+
+  @media print{
+    body *{visibility:hidden;}
+    #receiptPrintArea, #receiptPrintArea *{visibility:visible;}
+    #receiptPrintArea{position:absolute;left:0;top:0;width:58mm;padding:1mm 1.5mm;font-size:10px;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="topbar">
+    <button class="menu-btn" onclick="openSettings()"><i class="fa-solid fa-bars"></i></button>
+    <h1 id="modeTitle">Item Wise Bill</h1>
+    <button class="pill-btn pill-orange" onclick="openBillReport()">Bill Report</button>
+    <button class="pill-btn pill-green" id="switchModeBtn" onclick="switchMode()">Quick Bill</button>
+  </div>
+
+  <!-- TABLE HEAD : item wise -->
+  <div class="table-head" id="tableHeadItemWise">
+    <span>ITEM</span><span class="col-qty">QTY</span><span class="col-rate">RATE</span><span class="col-total">TOTAL</span>
+  </div>
+  <!-- TABLE HEAD : quick bill -->
+  <div class="table-head hidden" id="tableHeadQuick">
+    <span class="col-sr">SR</span><span class="col-details">DETAILS</span><span class="col-qty">QTY</span><span class="col-rate">RATE</span><span class="col-total">TOTAL</span>
+  </div>
+
+  <!-- CART -->
+  <div class="cart-list" id="cartList"></div>
+
+  <!-- TOTAL BAR -->
+  <div class="totalbar">
+    <span id="totalQty">0</span>
+    <span id="totalAmt">₹0</span>
+  </div>
+
+  <!-- ITEM WISE PANEL -->
+  <div id="itemWisePanel">
+    <div class="actions">
+      <button class="btn-red" onclick="clearCart()"><i class="fa-solid fa-xmark"></i> Clear</button>
+      <button class="btn-orange" onclick="openAddProduct()"><i class="fa-solid fa-plus"></i> Add Product</button>
+      <button class="btn-gray" onclick="openPrintPreview()"><i class="fa-solid fa-print"></i> Print</button>
+      <button class="btn-gray" onclick="saveBill()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+      <button class="btn-orange icon-only" onclick="toast('Barcode scanning needs a camera/scanner integration.')"><i class="fa-solid fa-barcode"></i></button>
+      <button class="btn-orange icon-only" onclick="toggleSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </div>
+
+    <div class="categories" id="categories"></div>
+    <div class="search-row" id="searchRow">
+      <input type="text" class="qb-field" placeholder="Search items..." oninput="renderGrid(this.value)">
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- QUICK BILL PANEL -->
+  <div id="quickBillPanel" class="hidden" style="display:flex;flex-direction:column;flex:1;">
+    <div class="qb-toprow">
+      <input type="text" id="qbDetails" class="qb-field" placeholder="Item / details (optional)">
+    </div>
+    <div class="qb-toprow" style="padding-top:0;">
+      <input type="text" id="qbQty" class="qb-field active-field" placeholder="Qty" readonly onclick="setActiveField('qty')">
+      <input type="text" id="qbRate" class="qb-field" placeholder="Rate" readonly onclick="setActiveField('rate')">
+      <button class="qb-icon-btn" onclick="openBillReport()"><i class="fa-solid fa-file-invoice"></i></button>
+      <button class="qb-icon-btn orange" onclick="openPrintPreview()"><i class="fa-solid fa-print"></i></button>
+    </div>
+    <div class="qb-body">
+      <div class="numpad" id="numpad"></div>
+      <div class="qb-sidebtns">
+        <button class="qb-save" onclick="saveBill()"><i class="fa-solid fa-floppy-disk"></i>Save</button>
+        <button class="qb-enter" onclick="quickBillEnter()"><i class="fa-solid fa-check"></i>Enter<br>X</button>
+        <button class="qb-clear" onclick="quickBillClear()"><i class="fa-solid fa-xmark"></i>C<br>Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal-overlay" id="settingsOverlay">
+    <div class="modal-sheet">
+      <div class="modal-title"><span>Shop Details</span><span class="close" onclick="closeModal('settingsOverlay')">&times;</span></div>
+      <div class="field-label">Shop Name</div>
+      <input class="modal-input" id="cfgName" value="My Canteen">
+      <div class="field-label">Address</div>
+      <input class="modal-input" id="cfgAddress" value="Bhubaneswar">
+      <div class="field-label">Phone</div>
+      <input class="modal-input" id="cfgPhone" value="">
+      <div class="field-label">Footer note</div>
+      <input class="modal-input" id="cfgFooter" value="Thank you, visit again!">
+      <div class="modal-actions">
+        <button class="btn-orange" onclick="saveSettings()">Save</button>
+      </div>
+      <div class="field-label" style="margin-top:18px;">Items Data (JSON)</div>
+      <div class="modal-actions" style="margin-top:6px;">
+        <button class="btn-gray" onclick="exportItemsJSON()"><i class="fa-solid fa-file-export"></i>&nbsp; Export</button>
+        <button class="btn-gray" onclick="document.getElementById('importFileInput').click()"><i class="fa-solid fa-file-import"></i>&nbsp; Import</button>
+      </div>
+      <input type="file" id="importFileInput" accept="application/json" class="hidden" onchange="importItemsJSON(event)">
+      <p style="font-size:11px;color:#999;margin-top:8px;line-height:1.4;">
+        Items, prices and categories auto-save to this device as you add/edit them, and reload automatically next time you open this page. Export gives you a JSON file to back up or move to another device; Import loads a JSON file you exported before.
+      </p>
+      <div class="field-label" style="margin-top:18px;">Default Bluetooth Printer</div>
+      <div style="font-size:13px;color:#444;margin:4px 0 8px;" id="defaultPrinterLabel">Not set — Bluetooth Print will ask you to pick a device</div>
+      <div class="modal-actions">
+        <button class="btn-orange" onclick="chooseBluetoothPrinter()"><i class="fa-brands fa-bluetooth-b"></i>&nbsp; Set / Change</button>
+        <button class="btn-gray" onclick="forgetBluetoothPrinter()"><i class="fa-solid fa-xmark"></i>&nbsp; Forget</button>
+      </div>
+      <p style="font-size:11px;color:#999;margin-top:8px;line-height:1.4;">
+        Once set, tapping Bluetooth Print reconnects to this printer automatically — no picker each time. Needs Chrome; if your browser doesn't support saved devices, it'll fall back to asking each time.
+      </p>
+    </div>
+  </div>
+
+
+  <!-- ADD PRODUCT MODAL -->
+  <div class="modal-overlay" id="addProductOverlay">
+    <div class="modal-sheet">
+      <div class="modal-title"><span id="npTitle">Add Product</span><span class="close" onclick="closeModal('addProductOverlay')">&times;</span></div>
+      <div class="field-label">Name</div>
+      <input class="modal-input" id="npName" placeholder="e.g. Paneer Roll">
+      <div class="field-label">Price (₹)</div>
+      <input class="modal-input" id="npPrice" type="number" inputmode="decimal" placeholder="e.g. 90">
+      <div class="field-label">Category</div>
+      <div class="cat-toggle">
+        <button class="sel" id="npCatVeg" onclick="selectNewCat('veg')">VEG</button>
+        <button id="npCatNonveg" onclick="selectNewCat('nonveg')">NON VEG</button>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-red hidden" id="npDeleteBtn" onclick="deleteProduct()"><i class="fa-solid fa-trash"></i>&nbsp; Delete</button>
+        <button class="btn-orange" id="npSaveBtn" onclick="addProduct()">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BILL REPORT MODAL -->
+  <div class="modal-overlay" id="billReportOverlay">
+    <div class="modal-sheet">
+      <div class="modal-title"><span>Bill Report</span><span class="close" onclick="closeModal('billReportOverlay')">&times;</span></div>
+      <div id="billReportList"></div>
+    </div>
+  </div>
+
+  <!-- PRINT PREVIEW MODAL -->
+  <div class="modal-overlay" id="printOverlay">
+    <div class="modal-sheet">
+      <div class="modal-title"><span>Print Bill</span><span class="close" onclick="closeModal('printOverlay')">&times;</span></div>
+      <div id="receiptPrintArea"></div>
+      <div class="modal-actions">
+        <button class="btn-gray" onclick="printSystem()"><i class="fa-solid fa-print"></i>&nbsp; System Print</button>
+        <button class="btn-orange" onclick="printBluetooth()"><i class="fa-brands fa-bluetooth-b"></i>&nbsp; Bluetooth (BLE)</button>
+      </div>
+      <div class="modal-actions" style="margin-top:8px;">
+        <button class="btn-green" onclick="printViaRawBT()" style="background:var(--green);"><i class="fa-solid fa-print"></i>&nbsp; Print via RawBT app (for MPT-II)</button>
+      </div>
+      <p style="font-size:11px;color:#999;margin-top:10px;line-height:1.4;">
+        Your MPT-II is a classic-Bluetooth (SPP) printer — browsers can't talk to that directly, so "Bluetooth (BLE)" will keep asking to pair and never actually print on it.<br><br>
+        Use <b>Print via RawBT app</b> instead: install the free <b>"RawBT Print Service"</b> app from the Play Store, open it once and pair/select your MPT-II inside RawBT's own settings, then just tap this button each time — it hands the bill straight to RawBT, no repeated pairing.
+      </p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ---------------- STATE ---------------- */
+const DEFAULT_ITEMS = [
+  {id:1, name:'Chicken Thali', price:100, cat:'nonveg'},
+  {id:2, name:'Egg Thali', price:80, cat:'nonveg'},
+  {id:3, name:'Fish Thali', price:80, cat:'nonveg'},
+  {id:4, name:'Mashroom Thali', price:90, cat:'veg'},
+  {id:5, name:'Mutton Thali', price:90, cat:'nonveg'},
+  {id:6, name:'Panner Thali', price:90, cat:'veg'},
+  {id:7, name:'VEG Thali', price:70, cat:'veg'},
+];
+const CACHE_KEY = 'pos_cache_v1';
+let items = DEFAULT_ITEMS.slice();
+let nextItemId = 8;
+let activeCategory = 'all';
+let mode = 'itemwise'; // 'itemwise' | 'quickbill'
+let cart = []; // itemwise: {id,name,rate,qty}
+let qbRows = []; // quickbill: {sr,details,qty,rate,total}
+let qbActiveField = 'qty';
+let qbNextSr = 1;
+let newProdCat = 'veg';
+let editingItemId = null; // null = "add" mode, otherwise editing this item id
+let billHistory = []; // {id, mode, ts, rows, total, qty}
+let shopCfg = {name:'My Canteen', address:'Bhubaneswar', phone:'', footer:'Thank you, visit again!'};
+
+/* ---------------- CACHE (auto-save / auto-load on this device) ---------------- */
+function loadFromCache(){
+  try{
+    const raw = localStorage.getItem(CACHE_KEY);
+    if(!raw) return;
+    const data = JSON.parse(raw);
+    if(Array.isArray(data.items) && data.items.length){
+      items = data.items;
+      nextItemId = Math.max(...items.map(i=>i.id), 0) + 1;
+    }
+    if(data.shopCfg) shopCfg = Object.assign(shopCfg, data.shopCfg);
+  }catch(e){ console.warn('Cache load failed', e); }
+}
+function saveToCache(){
+  try{
+    localStorage.setItem(CACHE_KEY, JSON.stringify({items, shopCfg}));
+  }catch(e){ console.warn('Cache save failed', e); }
+}
+
+/* ---------------- INIT ---------------- */
+function renderGrid(filter){
+  const grid = document.getElementById('grid');
+  const q = (filter||'').trim().toLowerCase();
+  let list = items.filter(it => activeCategory==='all' || it.cat===activeCategory);
+  if(q) list = list.filter(it => it.name.toLowerCase().includes(q));
+  grid.innerHTML = list.map(it => `
+    <div class="card" onclick="addItemToCart(${it.id})">
+      <i class="fa-solid fa-pen edit-pencil" onclick="event.stopPropagation(); openEditProduct(${it.id})"></i>
+      <div class="pname">${escapeHtml(it.name)}</div>
+      <div class="prate">₹${it.price}</div>
+    </div>`).join('') + `<div class="card add-new" onclick="openAddProduct()"><i class="fa-solid fa-plus" style="font-size:20px;"></i></div>`;
+}
+
+function renderCategories(){
+  const cats = [{key:'all',label:'ALL'},{key:'nonveg',label:'NON VEG'},{key:'veg',label:'VEG'}];
+  document.getElementById('categories').innerHTML = cats.map(c =>
+    `<div class="chip ${activeCategory===c.key?'active':''}" onclick="setCategory('${c.key}')">${c.label}</div>`
+  ).join('');
+}
+function setCategory(cat){ activeCategory = cat; renderCategories(); renderGrid(); }
+
+function setupNumpad(){
+  const keys = ['7','8','9','4','5','6','1','2','3','0','.',''];
+  const pad = document.getElementById('numpad');
+  pad.innerHTML = keys.map(k => k==='' ? '' : `<button onclick="numpadPress('${k}')">${k}</button>`).join('');
+}
+
+/* ---------------- MODE SWITCH ---------------- */
+function switchMode(){
+  mode = (mode==='itemwise') ? 'quickbill' : 'itemwise';
+  const isItem = mode==='itemwise';
+  document.getElementById('modeTitle').textContent = isItem ? 'Item Wise Bill' : 'Quick Bill';
+  document.getElementById('switchModeBtn').textContent = isItem ? 'Quick Bill' : 'Item Wise Bill';
+  document.getElementById('tableHeadItemWise').classList.toggle('hidden', !isItem);
+  document.getElementById('tableHeadQuick').classList.toggle('hidden', isItem);
+  document.getElementById('itemWisePanel').classList.toggle('hidden', !isItem);
+  document.getElementById('quickBillPanel').classList.toggle('hidden', isItem);
+  renderCart();
+}
+
+/* ---------------- ITEM WISE CART ---------------- */
+function addItemToCart(id){
+  const it = items.find(i=>i.id===id);
+  if(!it) return;
+  const existing = cart.find(c=>c.id===id);
+  if(existing) existing.qty += 1;
+  else cart.push({id:it.id, name:it.name, rate:it.price, qty:1});
+  renderCart();
+}
+function changeQty(id, delta){
+  const row = cart.find(c=>c.id===id);
+  if(!row) return;
+  row.qty += delta;
+  if(row.qty<=0) cart = cart.filter(c=>c.id!==id);
+  renderCart();
+}
+function removeCartRow(id){ cart = cart.filter(c=>c.id!==id); renderCart(); }
+function clearCart(){
+  if(mode==='itemwise') cart = [];
+  else { qbRows = []; qbNextSr = 1; }
+  renderCart();
+}
+
+/* ---------------- QUICK BILL ---------------- */
+function setActiveField(f){
+  qbActiveField = f;
+  document.getElementById('qbQty').classList.toggle('active-field', f==='qty');
+  document.getElementById('qbRate').classList.toggle('active-field', f==='rate');
+}
+function numpadPress(k){
+  const el = document.getElementById(qbActiveField==='qty' ? 'qbQty' : 'qbRate');
+  if(k==='.'){ if(!el.value.includes('.')) el.value += '.'; return; }
+  el.value = (el.value==='0') ? k : el.value + k;
+}
+function quickBillClear(){
+  const el = document.getElementById(qbActiveField==='qty' ? 'qbQty' : 'qbRate');
+  el.value = el.value.slice(0,-1);
+}
+function quickBillEnter(){
+  const qty = parseFloat(document.getElementById('qbQty').value) || 0;
+  const rate = parseFloat(document.getElementById('qbRate').value) || 0;
+  const details = document.getElementById('qbDetails').value.trim() || 'Item';
+  if(qty<=0 || rate<=0){ toast('Enter qty and rate'); return; }
+  qbRows.push({sr:qbNextSr++, details, qty, rate, total: qty*rate});
+  document.getElementById('qbQty').value='';
+  document.getElementById('qbRate').value='';
+  document.getElementById('qbDetails').value='';
+  setActiveField('qty');
+  renderCart();
+}
+
+/* ---------------- RENDER CART / TOTALS ---------------- */
+function renderCart(){
+  const listEl = document.getElementById('cartList');
+  if(mode==='itemwise'){
+    if(cart.length===0){
+      listEl.innerHTML = `<div class="cart-empty">No items added yet — tap an item below</div>`;
+    } else {
+      listEl.innerHTML = cart.map(c => `
+        <div class="cart-row">
+          <div class="name">${escapeHtml(c.name)}</div>
+          <div class="qtybox">
+            <button onclick="changeQty(${c.id},-1)">-</button>
+            <span>${c.qty}</span>
+            <button onclick="changeQty(${c.id},1)">+</button>
+          </div>
+          <div class="rate">₹${c.rate}</div>
+          <div class="total">₹${(c.rate*c.qty).toFixed(0)}</div>
+          <div class="del" onclick="removeCartRow(${c.id})"><i class="fa-solid fa-trash"></i></div>
+        </div>`).join('');
+    }
+    const totQty = cart.reduce((s,c)=>s+c.qty,0);
+    const totAmt = cart.reduce((s,c)=>s+c.qty*c.rate,0);
+    document.getElementById('totalQty').textContent = totQty;
+    document.getElementById('totalAmt').textContent = '₹'+totAmt.toFixed(0);
+  } else {
+    if(qbRows.length===0){
+      listEl.innerHTML = `<div class="cart-empty">No rows yet — enter qty & rate, then Enter</div>`;
+    } else {
+      listEl.innerHTML = qbRows.map(r => `
+        <div class="cart-row">
+          <div style="width:30px;">${r.sr}</div>
+          <div class="name">${escapeHtml(r.details)}</div>
+          <div class="qtybox" style="width:40px;"><span>${r.qty}</span></div>
+          <div class="rate">₹${r.rate}</div>
+          <div class="total">₹${r.total.toFixed(0)}</div>
+          <div class="del" onclick="removeQbRow(${r.sr})"><i class="fa-solid fa-trash"></i></div>
+        </div>`).join('');
+    }
+    const totQty = qbRows.reduce((s,r)=>s+r.qty,0);
+    const totAmt = qbRows.reduce((s,r)=>s+r.total,0);
+    document.getElementById('totalQty').textContent = totQty;
+    document.getElementById('totalAmt').textContent = '₹'+totAmt.toFixed(0);
+  }
+}
+function removeQbRow(sr){ qbRows = qbRows.filter(r=>r.sr!==sr); renderCart(); }
+
+/* ---------------- ADD / EDIT / DELETE PRODUCT ---------------- */
+function openAddProduct(){
+  editingItemId = null;
+  document.getElementById('npTitle').textContent = 'Add Product';
+  document.getElementById('npSaveBtn').textContent = 'Add';
+  document.getElementById('npDeleteBtn').classList.add('hidden');
+  document.getElementById('npName').value='';
+  document.getElementById('npPrice').value='';
+  selectNewCat('veg');
+  showModal('addProductOverlay');
+}
+function openEditProduct(id){
+  const it = items.find(i=>i.id===id);
+  if(!it) return;
+  editingItemId = id;
+  document.getElementById('npTitle').textContent = 'Edit Product';
+  document.getElementById('npSaveBtn').textContent = 'Update';
+  document.getElementById('npDeleteBtn').classList.remove('hidden');
+  document.getElementById('npName').value = it.name;
+  document.getElementById('npPrice').value = it.price;
+  selectNewCat(it.cat);
+  showModal('addProductOverlay');
+}
+function selectNewCat(c){
+  newProdCat = c;
+  document.getElementById('npCatVeg').classList.toggle('sel', c==='veg');
+  document.getElementById('npCatNonveg').classList.toggle('sel', c==='nonveg');
+}
+function addProduct(){
+  const name = document.getElementById('npName').value.trim();
+  const price = parseFloat(document.getElementById('npPrice').value);
+  if(!name || !price || price<=0){ toast('Enter a valid name & price'); return; }
+  if(editingItemId!=null){
+    const it = items.find(i=>i.id===editingItemId);
+    if(it){ it.name = name; it.price = price; it.cat = newProdCat; }
+    toast('Product updated');
+  } else {
+    items.push({id:nextItemId++, name, price, cat:newProdCat});
+    toast('Product added');
+  }
+  saveToCache();
+  closeModal('addProductOverlay');
+  renderGrid();
+}
+function deleteProduct(){
+  if(editingItemId==null) return;
+  items = items.filter(i=>i.id!==editingItemId);
+  saveToCache();
+  closeModal('addProductOverlay');
+  renderGrid();
+  toast('Product deleted');
+}
+
+/* ---------------- IMPORT / EXPORT JSON ---------------- */
+function exportItemsJSON(){
+  const payload = {exportedAt:new Date().toISOString(), items, shopCfg};
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'pos-items-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  toast('Items exported');
+}
+function importItemsJSON(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const data = JSON.parse(reader.result);
+      const importedItems = Array.isArray(data) ? data : data.items;
+      if(!Array.isArray(importedItems) || !importedItems.length) throw new Error('No items found in file');
+      const clean = importedItems.map((it,idx) => ({
+        id: Number.isFinite(it.id) ? it.id : idx+1,
+        name: String(it.name||'Item'),
+        price: parseFloat(it.price)||0,
+        cat: (it.cat==='veg'||it.cat==='nonveg') ? it.cat : 'veg'
+      }));
+      items = clean;
+      nextItemId = Math.max(...items.map(i=>i.id), 0) + 1;
+      if(data.shopCfg) shopCfg = Object.assign(shopCfg, data.shopCfg);
+      saveToCache();
+      renderGrid();
+      toast('Items imported ('+items.length+')');
+    }catch(e){
+      toast('Import failed: '+e.message);
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+/* ---------------- SEARCH ---------------- */
+function toggleSearch(){
+  document.getElementById('searchRow').classList.toggle('show');
+}
+
+/* ---------------- SETTINGS ---------------- */
+function openSettings(){
+  document.getElementById('cfgName').value = shopCfg.name;
+  document.getElementById('cfgAddress').value = shopCfg.address;
+  document.getElementById('cfgPhone').value = shopCfg.phone;
+  document.getElementById('cfgFooter').value = shopCfg.footer;
+  refreshDefaultPrinterLabel();
+  showModal('settingsOverlay');
+}
+function saveSettings(){
+  shopCfg = {
+    name: document.getElementById('cfgName').value.trim() || 'My Shop',
+    address: document.getElementById('cfgAddress').value.trim(),
+    phone: document.getElementById('cfgPhone').value.trim(),
+    footer: document.getElementById('cfgFooter').value.trim(),
+  };
+  saveToCache();
+  closeModal('settingsOverlay');
+  toast('Settings saved');
+}
+
+/* ---------------- BILL SAVE / REPORT ---------------- */
+function currentBillRows(){
+  if(mode==='itemwise') return cart.map(c=>({name:c.name, qty:c.qty, rate:c.rate, total:c.qty*c.rate}));
+  return qbRows.map(r=>({name:r.details, qty:r.qty, rate:r.rate, total:r.total}));
+}
+function saveBill(){
+  const rows = currentBillRows();
+  if(rows.length===0){ toast('Nothing to save'); return; }
+  const total = rows.reduce((s,r)=>s+r.total,0);
+  const qty = rows.reduce((s,r)=>s+r.qty,0);
+  billHistory.unshift({id:Date.now(), mode, ts:new Date(), rows, total, qty});
+  clearCart();
+  toast('Bill saved');
+}
+function openBillReport(){
+  const el = document.getElementById('billReportList');
+  if(billHistory.length===0){
+    el.innerHTML = `<div class="cart-empty">No saved bills yet</div>`;
+  } else {
+    el.innerHTML = billHistory.map(b => `
+      <div class="bill-item">
+        <div>
+          <div class="amt">₹${b.total.toFixed(0)}</div>
+          <div class="meta">${b.ts.toLocaleString()} · ${b.qty} items</div>
+        </div>
+        <div class="actbtns">
+          <i class="fa-solid fa-print" onclick="printSavedBill(${b.id})"></i>
+          <i class="fa-solid fa-trash" onclick="deleteBill(${b.id})"></i>
+        </div>
+      </div>`).join('');
+  }
+  showModal('billReportOverlay');
+}
+function deleteBill(id){ billHistory = billHistory.filter(b=>b.id!==id); openBillReport(); }
+function printSavedBill(id){
+  const b = billHistory.find(x=>x.id===id);
+  if(!b) return;
+  closeModal('billReportOverlay');
+  buildReceipt(b.rows, b.total, b.ts);
+  showModal('printOverlay');
+}
+
+/* ---------------- RECEIPT / PRINT ---------------- */
+function buildReceipt(rows, total, ts){
+  const now = ts || new Date();
+  const dateStr = now.toLocaleDateString('en-GB').replace(/\//g,'-') + '  ' + now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+  let html = `<div class="rc-center rc-bold" style="font-size:12.5px;">${escapeHtml(shopCfg.name)}</div>`;
+  if(shopCfg.address) html += `<div class="rc-center">${escapeHtml(shopCfg.address)}</div>`;
+  if(shopCfg.phone) html += `<div class="rc-center">${escapeHtml(shopCfg.phone)}</div>`;
+  html += `<div class="rc-line"></div>`;
+  html += `<div class="rc-row"><span>${dateStr}</span></div>`;
+  html += `<div class="rc-line"></div>`;
+  html += `<div class="rc-row rc-bold"><span>ITEM</span><span>QTY&nbsp;&nbsp;RATE&nbsp;&nbsp;TOTAL</span></div>`;
+  html += `<div class="rc-line"></div>`;
+  rows.forEach(r=>{
+    html += `<div class="rc-row"><span>${escapeHtml(r.name)}</span><span>${r.qty}&nbsp;&nbsp;&nbsp;${r.rate}&nbsp;&nbsp;&nbsp;${r.total.toFixed(0)}</span></div>`;
+  });
+  html += `<div class="rc-line"></div>`;
+  html += `<div class="rc-row rc-bold" style="font-size:12px;"><span>Total: INR</span><span>${total.toFixed(0)}</span></div>`;
+  html += `<div class="rc-line"></div>`;
+  if(shopCfg.footer) html += `<div class="rc-center">${escapeHtml(shopCfg.footer)}</div>`;
+  html += `<div class="rc-center" style="color:#888;font-size:9px;margin-top:2px;">Powered by ${escapeHtml(shopCfg.name)} POS</div>`;
+  document.getElementById('receiptPrintArea').innerHTML = html;
+  window._lastReceiptRows = rows;
+  window._lastReceiptTotal = total;
+  window._lastReceiptTs = now;
+}
+function openPrintPreview(){
+  const rows = currentBillRows();
+  if(rows.length===0){ toast('Add items first'); return; }
+  const total = rows.reduce((s,r)=>s+r.total,0);
+  buildReceipt(rows, total, new Date());
+  showModal('printOverlay');
+}
+function printSystem(){
+  window.print();
+}
+
+/* ---- RawBT app printing (works with classic Bluetooth/SPP printers like MPT-II) ---- */
+function bytesToBinaryString(bytes){
+  let s = '';
+  for(let i=0;i<bytes.length;i++) s += String.fromCharCode(bytes[i]);
+  return s;
+}
+function printViaRawBT(){
+  try{
+    const bytes = encodeReceiptESCPOS(window._lastReceiptRows||[], window._lastReceiptTotal||0);
+    const raw = bytesToBinaryString(bytes);
+    const intentUrl = 'intent:' + encodeURI(raw) + '#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;';
+    window.location.href = intentUrl;
+  }catch(e){
+    toast('Could not open RawBT. Make sure the RawBT app is installed.');
+  }
+}
+
+
+/* ---- Bluetooth ESC/POS printing (best-effort, generic thermal printers) ---- */
+const BT_ID_KEY = 'pos_bt_device_id';
+const BT_NAME_KEY = 'pos_bt_device_name';
+const BT_SERVICES = [
+  '000018f0-0000-1000-8000-00805f9b34fb',
+  '0000ff00-0000-1000-8000-00805f9b34fb',
+  'e7810a71-73ae-499d-8c15-faa9aef0c3f2'
+];
+function refreshDefaultPrinterLabel(){
+  const name = localStorage.getItem(BT_NAME_KEY);
+  document.getElementById('defaultPrinterLabel').textContent = name
+    ? ('Connected to: ' + name)
+    : 'Not set — Bluetooth Print will ask you to pick a device';
+}
+async function getSavedBluetoothDevice(){
+  const savedId = localStorage.getItem(BT_ID_KEY);
+  if(!savedId || !navigator.bluetooth || !navigator.bluetooth.getDevices) return null;
+  try{
+    const devices = await navigator.bluetooth.getDevices();
+    return devices.find(d=>d.id===savedId) || null;
+  }catch(e){ return null; }
+}
+function rememberBluetoothDevice(device){
+  try{
+    localStorage.setItem(BT_ID_KEY, device.id);
+    localStorage.setItem(BT_NAME_KEY, device.name || 'Printer');
+  }catch(e){ /* ignore */ }
+  refreshDefaultPrinterLabel();
+}
+async function chooseBluetoothPrinter(){
+  if(!navigator.bluetooth){ toast('Web Bluetooth not supported in this browser.'); return; }
+  try{
+    const device = await navigator.bluetooth.requestDevice({acceptAllDevices:true, optionalServices:BT_SERVICES});
+    rememberBluetoothDevice(device);
+    toast('Default printer set: '+(device.name||'Printer'));
+  }catch(e){
+    toast('No device selected');
+  }
+}
+function forgetBluetoothPrinter(){
+  localStorage.removeItem(BT_ID_KEY);
+  localStorage.removeItem(BT_NAME_KEY);
+  refreshDefaultPrinterLabel();
+  toast('Default printer forgotten');
+}
+async function printBluetooth(){
+  if(!navigator.bluetooth){
+    toast('Web Bluetooth not supported in this browser. Try Chrome on Android/desktop.');
+    return;
+  }
+  try{
+    let device = await getSavedBluetoothDevice();
+    if(device){
+      toast('Connecting to '+(device.name||'saved printer')+'...');
+    } else {
+      device = await navigator.bluetooth.requestDevice({acceptAllDevices:true, optionalServices:BT_SERVICES});
+      toast('Connecting to '+(device.name||'printer')+'...');
+    }
+    const server = await device.gatt.connect();
+    rememberBluetoothDevice(device);
+    let writeChar = null;
+    for(const svcUuid of BT_SERVICES){
+      try{
+        const service = await server.getPrimaryService(svcUuid);
+        const chars = await service.getCharacteristics();
+        writeChar = chars.find(c => c.properties.write || c.properties.writeWithoutResponse);
+        if(writeChar) break;
+      }catch(e){ /* try next service */ }
+    }
+    if(!writeChar){
+      toast('No writable printer service found. Try System Print instead.');
+      return;
+    }
+    const bytes = encodeReceiptESCPOS(window._lastReceiptRows||[], window._lastReceiptTotal||0);
+    const CHUNK = 100;
+    for(let i=0;i<bytes.length;i+=CHUNK){
+      const chunk = bytes.slice(i,i+CHUNK);
+      if(writeChar.properties.writeWithoutResponse) await writeChar.writeValueWithoutResponse(chunk);
+      else await writeChar.writeValue(chunk);
+      await new Promise(r=>setTimeout(r,40));
+    }
+    toast('Sent to printer');
+  }catch(e){
+    console.error(e);
+    toast('Bluetooth print failed: '+(e.message||'unknown error')+'. Try System Print.');
+  }
+}
+function encodeReceiptESCPOS(rows, total){
+  const enc = new TextEncoder();
+  const ESC = 0x1B, GS = 0x1D;
+  let parts = [];
+  const push = (arr) => parts.push(new Uint8Array(arr));
+  const pushText = (s) => parts.push(enc.encode(s.replace(/₹/g,'Rs.')));
+  const ts = window._lastReceiptTs || new Date();
+  const dateStr = ts.toLocaleDateString('en-GB').replace(/\//g,'-') + '  ' + ts.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+  push([ESC,0x40]); // init
+  push([ESC,0x33,20]); // tight line spacing (~20/180in) instead of the printer's default gap
+  push([ESC,0x61,0x01]); // center
+  push([ESC,0x45,0x01]); // bold on
+  pushText(shopCfg.name.toUpperCase()+'\n');
+  push([ESC,0x45,0x00]); // bold off
+  if(shopCfg.address) pushText(shopCfg.address+'\n');
+  if(shopCfg.phone) pushText(shopCfg.phone+'\n');
+  pushText('--------------------------------\n');
+  push([ESC,0x61,0x00]); // left
+  pushText(dateStr+'\n');
+  pushText('--------------------------------\n');
+  pushText(padLine('ITEM','QTY  RATE  TOTAL',32)+'\n');
+  pushText('--------------------------------\n');
+  rows.forEach(r=>{
+    pushText(r.name+'\n');
+    pushText(padLine('', `${r.qty}   ${r.rate}   ${r.total.toFixed(0)}`,32)+'\n');
+  });
+  pushText('--------------------------------\n');
+  push([ESC,0x61,0x01]); // center for the total
+  push([GS,0x21,0x11]);  // double width + double height
+  push([ESC,0x45,0x01]); // bold on
+  pushText(`Rs.${total.toFixed(0)}\n`);
+  push([GS,0x21,0x00]);  // back to normal size
+  push([ESC,0x45,0x00]); // bold off
+  push([ESC,0x61,0x00]); // left
+  pushText('--------------------------------\n');
+  push([ESC,0x61,0x01]);
+  if(shopCfg.footer){
+    pushText(shopCfg.footer+'\n');
+    pushText('\n\n\n\n'); // extra feed so the tear line clears past this text
+  } else {
+    pushText('\n\n'); // just enough to tear safely, no footer to protect
+  }
+  push([GS,0x56,0x00]); // cut
+  let totalLen = parts.reduce((s,p)=>s+p.length,0);
+  const out = new Uint8Array(totalLen);
+  let off=0;
+  parts.forEach(p=>{ out.set(p,off); off+=p.length; });
+  return out;
+}
+function padLine(left,right,width){
+  left = String(left); right = String(right);
+  const space = Math.max(1, width - left.length - right.length);
+  return left + ' '.repeat(space) + right;
+}
+
+/* ---------------- HELPERS ---------------- */
+function showModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/* ---------------- BOOT ---------------- */
+loadFromCache();
+renderCategories();
+renderGrid();
+setupNumpad();
+renderCart();
+</script>
+</body>
+</html>
