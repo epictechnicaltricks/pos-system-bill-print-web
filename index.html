@@ -220,6 +220,23 @@
 
   .hidden{display:none !important;}
 
+  /* ---------- RECEIPT PREVIEW ---------- */
+  #receiptPrintArea{
+    font-family:'Courier New',monospace;background:#fafafa;border:1px dashed #ccc;border-radius:6px;
+    padding:10px 12px;font-size:12px;line-height:1.5;max-height:50vh;overflow-y:auto;margin-bottom:6px;
+  }
+  #receiptPrintArea .rc-center{text-align:center;}
+  #receiptPrintArea .rc-bold{font-weight:700;}
+  #receiptPrintArea .rc-line{border-top:1px dashed #000;margin:3px 0;}
+  #receiptPrintArea .rc-row{display:flex;justify-content:space-between;gap:4px;}
+  #receiptPrintArea .rc-row span:first-child{flex:1;}
+
+  @media print{
+    body *{visibility:hidden;}
+    #receiptPrintArea, #receiptPrintArea *{visibility:visible;}
+    #receiptPrintArea{position:absolute;left:0;top:0;width:58mm;padding:1mm 1.5mm;font-size:10px;}
+  }
+
   /* ---------- RESPONSIVE: TABLET ---------- */
   @media (min-width:700px) and (max-width:999px){
     #app{max-width:760px;}
@@ -292,7 +309,7 @@
       <div class="actions">
         <button class="btn-red" onclick="clearCart()"><i class="fa-solid fa-xmark"></i> Clear</button>
         <button class="btn-orange" onclick="openAddProduct()"><i class="fa-solid fa-plus"></i> Add Product</button>
-        <button class="btn-gray" style="flex:1.6;" onclick="printBill()"><i class="fa-solid fa-print"></i> Print</button>
+        <button class="btn-gray" style="flex:1.6;" onclick="printBillDirect()"><i class="fa-solid fa-print"></i> Print</button>
         <button class="btn-orange icon-only" onclick="toggleSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
       </div>
 
@@ -315,7 +332,7 @@
       </div>
       <div class="actions" style="padding-top:0;">
         <button class="btn-red" onclick="clearCart()"><i class="fa-solid fa-xmark"></i> Clear</button>
-        <button class="btn-gray" style="flex:1.4;" onclick="printBill()"><i class="fa-solid fa-print"></i> Print</button>
+        <button class="btn-gray" style="flex:1.4;" onclick="printBillDirect()"><i class="fa-solid fa-print"></i> Print</button>
       </div>
       <div class="qb-body">
         <div class="numpad" id="numpad"></div>
@@ -403,13 +420,31 @@
     <div class="modal-sheet">
       <div class="modal-title"><span>Bill Report</span><span class="close" onclick="closeModal('billReportOverlay')">&times;</span></div>
       <div class="modal-actions" style="margin-bottom:12px;">
-        <button class="btn-gray" onclick="exportHistoryCSV()"><i class="fa-solid fa-file-csv"></i>&nbsp; Export CSV</button>
+        <button class="btn-gray" onclick="exportHistoryCSV()"><i class="fa-solid fa-file-csv"></i>&nbsp; Export All (7 Days)</button>
         <button class="btn-green" style="background:var(--green);" onclick="shareHistoryToWhatsApp()"><i class="fa-brands fa-whatsapp"></i>&nbsp; Share to WhatsApp</button>
       </div>
       <div id="billReportList"></div>
     </div>
   </div>
 
+  <!-- PRINT PREVIEW MODAL -->
+  <div class="modal-overlay" id="printOverlay">
+    <div class="modal-sheet">
+      <div class="modal-title"><span>Print Bill</span><span class="close" onclick="closeModal('printOverlay')">&times;</span></div>
+      <div id="receiptPrintArea"></div>
+      <div class="modal-actions">
+        <button class="btn-gray" onclick="printSystem()"><i class="fa-solid fa-print"></i>&nbsp; System Print</button>
+        <button class="btn-orange" onclick="printBluetooth()"><i class="fa-brands fa-bluetooth-b"></i>&nbsp; Bluetooth (BLE)</button>
+      </div>
+      <div class="modal-actions" style="margin-top:8px;">
+        <button class="btn-green" onclick="printViaRawBTModal()" style="background:var(--green);"><i class="fa-solid fa-print"></i>&nbsp; Print via RawBT app (for MPT-II)</button>
+      </div>
+      <p style="font-size:11px;color:#999;margin-top:10px;line-height:1.4;">
+        If your printer is a classic-Bluetooth (SPP) printer like the MPT-II, browsers can't talk to that directly, so "Bluetooth (BLE)" will keep asking to pair and never actually print on it.<br><br>
+        Use <b>Print via RawBT app</b> instead: install the free <b>"RawBT Print Service"</b> app from the Play Store, open it once and pair/select your printer inside RawBT's own settings, then just tap this button each time. Any option you tap here saves this bill to History.
+      </p>
+    </div>
+  </div>
 
   <div class="toast" id="toast"></div>
 </div>
@@ -475,7 +510,12 @@ let editingItemId = null; // null = "add" mode, otherwise editing this item id
 let billHistory = []; // {id, mode, ts, rows, total, qty}
 let shopCfg = {name:'My Canteen', address:'Bhubaneswar', phone:'', footer:'Thank you, visit again!'};
 
+const BILL_HISTORY_MAX_DAYS = 7;
 /* ---------------- CACHE (auto-save / auto-load on this device) ---------------- */
+function pruneOldBillHistory(){
+  const cutoff = Date.now() - BILL_HISTORY_MAX_DAYS*24*60*60*1000;
+  billHistory = billHistory.filter(b => b.ts && b.ts.getTime() >= cutoff);
+}
 function loadFromCache(){
   try{
     const raw = localStorage.getItem(CACHE_KEY);
@@ -491,15 +531,21 @@ function loadFromCache(){
     if(data.itemUsage) itemUsage = data.itemUsage;
     if(data.shopCfg) shopCfg = Object.assign(shopCfg, data.shopCfg);
     if(typeof data.fontScale === 'number') fontScale = data.fontScale;
+    if(Array.isArray(data.billHistory)){
+      billHistory = data.billHistory.map(b => ({...b, ts: new Date(b.ts)}));
+      pruneOldBillHistory();
+    }
   }catch(e){ console.warn('Cache load failed', e); }
 }
 function saveToCache(){
   try{
-    localStorage.setItem(CACHE_KEY, JSON.stringify({items, categories, itemUsage, shopCfg, fontScale}));
+    pruneOldBillHistory();
+    localStorage.setItem(CACHE_KEY, JSON.stringify({items, categories, itemUsage, shopCfg, fontScale, billHistory}));
   }catch(e){ console.warn('Cache save failed', e); }
 }
 
 /* ---------------- INIT ---------------- */
+let recentItemsCache = null; // frozen order while viewing the Recent tab; recomputed on tab switch
 function getRecentItems(){
   return Object.entries(itemUsage)
     .map(([id,u]) => ({item: items.find(i=>i.id===Number(id)), ...u}))
@@ -513,7 +559,8 @@ function renderGrid(filter){
   const q = (filter||'').trim().toLowerCase();
   let list;
   if(activeCategory === RECENT_KEY){
-    list = getRecentItems();
+    if(!recentItemsCache) recentItemsCache = getRecentItems();
+    list = recentItemsCache;
   } else {
     list = items.filter(it => it.cat===activeCategory);
   }
@@ -536,7 +583,12 @@ function renderCategories(){
     `<div class="chip ${activeCategory===c.key?'active':''}" onclick="setCategory('${c.key}')">${escapeHtml(c.label)}</div>`
   ).join('');
 }
-function setCategory(cat){ activeCategory = cat; renderCategories(); renderGrid(); }
+function setCategory(cat){
+  activeCategory = cat;
+  if(cat === RECENT_KEY) recentItemsCache = null; // recompute fresh order on entering the tab
+  renderCategories();
+  renderGrid();
+}
 
 /* ---------------- FONT SIZE ---------------- */
 function applyFontScale(){
@@ -905,7 +957,10 @@ function openBillReport(){
       <div style="margin-top:10px;">
         <div style="display:flex;justify-content:space-between;align-items:center;background:#f2f2f2;border-radius:8px;padding:8px 12px;margin-bottom:4px;">
           <span style="font-weight:800;">${g.dateLabel}</span>
-          <span style="font-weight:800;color:var(--orange-dark);">₹${g.total.toFixed(0)}</span>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="font-weight:800;color:var(--orange-dark);">₹${g.total.toFixed(0)}</span>
+            <i class="fa-solid fa-file-csv" style="cursor:pointer;color:#666;font-size:15px;" title="Export this date" onclick="exportHistoryCSV('${g.dateLabel}')"></i>
+          </div>
         </div>
         ${g.bills.map(b => `
           <div class="bill-item">
@@ -930,15 +985,60 @@ function printSavedBill(id){
   toast('Reprinting...');
 }
 
-/* ---------------- PRINT (direct, one tap: saves to history + sends to RawBT) ---------------- */
-function printBill(){
+/* ---------------- RECEIPT PREVIEW / PRINT DIALOG ---------------- */
+function buildReceipt(rows, total, ts){
+  const now = ts || new Date();
+  const dateStr = now.toLocaleDateString('en-GB').replace(/\//g,'-') + '  ' + now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+  let html = `<div class="rc-center rc-bold" style="font-size:12.5px;">${escapeHtml(shopCfg.name)}</div>`;
+  if(shopCfg.address) html += `<div class="rc-center">${escapeHtml(shopCfg.address)}</div>`;
+  if(shopCfg.phone) html += `<div class="rc-center">${escapeHtml(shopCfg.phone)}</div>`;
+  html += `<div class="rc-line"></div>`;
+  html += `<div class="rc-row"><span>${dateStr}</span></div>`;
+  html += `<div class="rc-line"></div>`;
+  html += `<div class="rc-row rc-bold"><span>ITEM</span><span>QTY&nbsp;&nbsp;RATE&nbsp;&nbsp;TOTAL</span></div>`;
+  html += `<div class="rc-line"></div>`;
+  rows.forEach(r=>{
+    html += `<div class="rc-row"><span>${escapeHtml(r.name)}</span><span>${r.qty}&nbsp;&nbsp;&nbsp;${r.rate}&nbsp;&nbsp;&nbsp;${r.total.toFixed(0)}</span></div>`;
+  });
+  html += `<div class="rc-line"></div>`;
+  html += `<div class="rc-row rc-bold" style="font-size:12px;"><span>Total: INR</span><span>${total.toFixed(0)}</span></div>`;
+  html += `<div class="rc-line"></div>`;
+  if(shopCfg.footer) html += `<div class="rc-center">${escapeHtml(shopCfg.footer)}</div>`;
+  html += `<div class="rc-center" style="color:#888;font-size:9px;margin-top:2px;">Powered by ${escapeHtml(shopCfg.name)} POS</div>`;
+  document.getElementById('receiptPrintArea').innerHTML = html;
+  window._lastReceiptRows = rows;
+  window._lastReceiptTotal = total;
+  window._lastReceiptTs = now;
+}
+function openPrintPreview(){
   const rows = currentBillRows();
   if(rows.length===0){ toast('Add items first'); return; }
   const total = rows.reduce((s,r)=>s+r.total,0);
-  const ts = new Date();
-  addBillToHistory(rows, total, ts);
-  printViaRawBT(rows, total, ts);
+  buildReceipt(rows, total, new Date());
+  showModal('printOverlay');
+}
+/* Main Print button: skip the preview dialog and go straight to Bluetooth (BLE). */
+function printBillDirect(){
+  const rows = currentBillRows();
+  if(rows.length===0){ toast('Add items first'); return; }
+  const total = rows.reduce((s,r)=>s+r.total,0);
+  buildReceipt(rows, total, new Date());
+  printBluetooth();
+}
+/* Saves the currently-previewed bill to history and clears the cart — called once printing has been kicked off, from any of the print methods below. */
+function finalizePrintedBill(){
+  addBillToHistory(window._lastReceiptRows||[], window._lastReceiptTotal||0, window._lastReceiptTs||new Date());
   clearCart();
+  closeModal('printOverlay');
+}
+function printSystem(){
+  window.print();
+  finalizePrintedBill();
+  toast('Bill saved & sent to printer');
+}
+function printViaRawBTModal(){
+  printViaRawBT(window._lastReceiptRows||[], window._lastReceiptTotal||0, window._lastReceiptTs||new Date());
+  finalizePrintedBill();
   toast('Bill saved & sent to printer');
 }
 
@@ -959,9 +1059,53 @@ function printViaRawBT(rows, total, ts){
   }
 }
 
+/* ---- Bluetooth ESC/POS printing (best-effort, generic BLE thermal printers) ---- */
+const BT_SERVICES = [
+  '000018f0-0000-1000-8000-00805f9b34fb',
+  '0000ff00-0000-1000-8000-00805f9b34fb',
+  'e7810a71-73ae-499d-8c15-faa9aef0c3f2'
+];
+async function printBluetooth(){
+  if(!navigator.bluetooth){
+    toast('Web Bluetooth not supported in this browser. Try Chrome on Android/desktop.');
+    return;
+  }
+  try{
+    const device = await navigator.bluetooth.requestDevice({acceptAllDevices:true, optionalServices:BT_SERVICES});
+    toast('Connecting to '+(device.name||'printer')+'...');
+    const server = await device.gatt.connect();
+    let writeChar = null;
+    for(const svcUuid of BT_SERVICES){
+      try{
+        const service = await server.getPrimaryService(svcUuid);
+        const chars = await service.getCharacteristics();
+        writeChar = chars.find(c => c.properties.write || c.properties.writeWithoutResponse);
+        if(writeChar) break;
+      }catch(e){ /* try next service */ }
+    }
+    if(!writeChar){
+      toast('No writable printer service found. Try System Print instead.');
+      return;
+    }
+    const bytes = encodeReceiptESCPOS(window._lastReceiptRows||[], window._lastReceiptTotal||0, window._lastReceiptTs);
+    const CHUNK = 100;
+    for(let i=0;i<bytes.length;i+=CHUNK){
+      const chunk = bytes.slice(i,i+CHUNK);
+      if(writeChar.properties.writeWithoutResponse) await writeChar.writeValueWithoutResponse(chunk);
+      else await writeChar.writeValue(chunk);
+      await new Promise(r=>setTimeout(r,40));
+    }
+    finalizePrintedBill();
+    toast('Sent to printer & bill saved');
+  }catch(e){
+    console.error(e);
+    toast('Bluetooth print failed: '+(e.message||'unknown error')+'. Try System Print.');
+  }
+}
+
 /* ---------------- CSV EXPORT / WHATSAPP SHARE (bill history) ---------------- */
-function buildHistoryCSV(){
-  const groups = groupHistoryByDate();
+function buildHistoryCSV(dateKey){
+  const groups = groupHistoryByDate().filter(g => !dateKey || g.dateLabel === dateKey);
   const rows = ['Date,Time,Items,Total'];
   groups.forEach(g=>{
     g.bills.forEach(b=>{
@@ -973,14 +1117,14 @@ function buildHistoryCSV(){
   });
   return rows.join('\n');
 }
-function exportHistoryCSV(){
+function exportHistoryCSV(dateKey){
   if(billHistory.length===0){ toast('No bill history yet'); return; }
-  const csv = buildHistoryCSV();
+  const csv = buildHistoryCSV(dateKey);
   const blob = new Blob([csv], {type:'text/csv'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'bill-history-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.download = (dateKey ? 'bill-history-'+dateKey.replace(/\//g,'-') : 'bill-history-'+new Date().toISOString().slice(0,10))+'.csv';
   document.body.appendChild(a);
   a.click();
   a.remove();
