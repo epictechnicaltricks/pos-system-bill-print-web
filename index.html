@@ -228,7 +228,7 @@
   .bill-item{
     display:flex;justify-content:space-between;align-items:center;padding:12px 4px;border-bottom:1px solid #eee;
   }
-  .bill-item .meta{font-size:calc(12px * var(--fscale));color:#888;}
+  .bill-item .meta{font-size:calc(14px * var(--fscale));font-weight:600;color:#777;}
   .bill-item .amt{font-weight:800;color:var(--orange-dark);font-size:calc(15px * var(--fscale));}
   .bill-item .actbtns{display:flex;gap:8px;}
   .bill-item .actbtns i{cursor:pointer;color:#666;font-size:calc(15px * var(--fscale));padding:4px;}
@@ -1018,6 +1018,7 @@ function addBillToHistory(rows, total, ts){
   saveToCache();
 }
 function dayKey(ts){ return ts.toLocaleDateString('en-GB'); } // dd/mm/yyyy, stable grouping key
+function fmtTime(ts){ return ts.toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit',hour12:true}).toUpperCase(); } // e.g. 10:15 AM
 function groupHistoryByDate(){
   const groups = [];
   const byKey = {};
@@ -1051,7 +1052,7 @@ function openBillReport(){
           <div class="bill-item" style="cursor:pointer;" onclick="toggleBillDetails(${b.id})">
             <div>
               <div class="amt">₹${b.total.toFixed(0)}</div>
-              <div class="meta">${b.ts.toLocaleTimeString()} · ${b.qty} items</div>
+              <div class="meta">${fmtTime(b.ts)} · ${b.qty} items</div>
             </div>
             <div class="actbtns">
               <i class="fa-solid fa-chevron-down chev" id="chev-${b.id}"></i>
@@ -1205,7 +1206,7 @@ function buildBillShareText(dateKey){
     lines.push('');
     lines.push(`📅 *${g.dateLabel}*`);
     g.bills.forEach(b=>{
-      lines.push(`— ${b.ts.toLocaleTimeString()} · ₹${b.total.toFixed(0)} (${b.qty} items)`);
+      lines.push(`— ${fmtTime(b.ts)} · ₹${b.total.toFixed(0)} (${b.qty} items)`);
       b.rows.forEach(r=>{
         lines.push(`   ${r.name} x${r.qty} @₹${r.rate} = ₹${r.total.toFixed(0)}`);
       });
@@ -1233,7 +1234,7 @@ function buildHistoryCSV(){
   groups.forEach(g=>{
     g.bills.forEach(b=>{
       b.rows.forEach((r,i)=>{
-        rows.push(`"${g.dateLabel}","${b.ts.toLocaleTimeString()}","${r.name.replace(/"/g,'""')}",${r.qty},${r.rate},${r.total.toFixed(0)},${i===0?b.total.toFixed(0):''}`);
+        rows.push(`"${g.dateLabel}","${fmtTime(b.ts)}","${r.name.replace(/"/g,'""')}",${r.qty},${r.rate},${r.total.toFixed(0)},${i===0?b.total.toFixed(0):''}`);
       });
     });
     rows.push(`"${g.dateLabel} TOTAL",,,,,,${g.total.toFixed(0)}`);
